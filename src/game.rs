@@ -4,65 +4,63 @@ use crate::{
 };
 use chrono::Duration;
 use std::{
-    ops::Deref,
     sync::{Arc, Mutex},
     time::Instant,
 };
 use timer::Timer;
 
-pub type EntityType<T> = Arc<Mutex<T>>;
+/// A type representing a single game entity.
+pub type Entity<T> = Arc<Mutex<T>>;
 
-/// A New Type of [`EntityType`] that represents a single game entity.
-#[derive(Debug)]
-pub struct Entity<T>(EntityType<T>);
-
-impl<T> Entity<T> {
-    /// Returns an entity based on the given object.
-    ///
-    /// # Example
-    /// ```
-    /// use ctrait::game::Entity;
-    ///
-    /// struct Player;
-    /// let entity = Entity::new(Player {});
-    /// ```
-    pub fn new(object: T) -> Self {
-        Self(Arc::new(Mutex::new(object)))
-    }
-}
-
-/// Allows the [`Entity`] to be dereferenced and directly accessed.
+/// Macro to quickly create a new entity.
 ///
 /// # Example
 /// ```
-/// use ctrait::game::Entity;
+/// use ctrait::entity;
 ///
-/// struct Player(u64);
-/// impl Player {
-///     fn get_value(&self) -> u64 {
-///         self.0
-///     }
-/// }
-/// let entity = Entity::new(Player(3));
-/// assert_eq!(entity.lock().unwrap().get_value(), 3);
+/// struct Player;
+///
+/// let player = entity!(Player {});
+/// // player now refers to an entity.
 /// ```
-impl<T> Deref for Entity<T> {
-    type Target = EntityType<T>;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+#[macro_export]
+macro_rules! entity {
+    ($object:expr) => {
+        std::sync::Arc::new(std::sync::Mutex::new($object))
+    };
 }
 
-/// Define a slice of entities that all implement a given trait.
+/// Macro to clone an existing entity.
 ///
-/// This is mainly useful when passing entities to [`Game`] as a slice.
+/// This does not clone the entity's inner type, rather it creates another pointer to it.
+///
+/// # Example
+/// ```
+/// use ctrait::{entity, entity_clone};
+///
+/// struct Player;
+///
+/// let player = entity!(Player {});
+/// let player_clone = entity_clone!(player);
+/// ```
+#[macro_export]
+macro_rules! entity_clone {
+    ($entity:expr) => {
+        std::sync::Arc::clone(&$entity)
+    };
+}
+
+/// Macro to define a slice of entities that all implement a given trait.
+///
+/// The first argument should be a trait that all following entities implement.
+/// The macro is mainly useful when passing entities to [`Game`] as a slice.
 ///
 /// # Example
 /// ```
 /// use ctrait::{
 ///     camera::Camera,
-///     entity_slice,
-///     game::{Entity, EntityType},
+///     entity, entity_slice,
+///     game::Game,
 ///     renderer::CanvasWindow,
 ///     traits::Renderable
 /// };
@@ -76,24 +74,25 @@ impl<T> Deref for Entity<T> {
 ///     fn render(&self, _: &Camera, _: &mut CanvasWindow) {}
 /// }
 ///
-/// let a = Entity::new(A {});
-/// let b = Entity::new(B {});
-/// let renderable_entities: Vec<EntityType<dyn Renderable>> =
-///     entity_slice!(Renderable, a, b).to_vec();
+/// let a = entity!(A {});
+/// let b = entity!(B {});
+///
+/// // Pass a slice of Renderable entities to the game.
+/// Game::default().with_renderable_entities(&entity_slice!(Renderable, a, b));
 /// ```
 #[macro_export]
 macro_rules! entity_slice {
     ($name:ident, $($entity:expr),+) => {
-        [$(std::sync::Arc::clone(&$entity) as ctrait::game::EntityType<dyn $name>),+]
+        [$(std::sync::Arc::clone(&$entity) as ctrait::game::Entity<dyn $name>),+]
     };
 }
 
 /// Game manager.
 pub struct Game {
-    update_entities: Vec<EntityType<dyn Update>>,
-    fixed_update_entities: Vec<EntityType<dyn FixedUpdate>>,
-    renderable_entities: Vec<EntityType<dyn Renderable>>,
-    interactive_entities: Vec<EntityType<dyn Interactive>>,
+    update_entities: Vec<Entity<dyn Update>>,
+    fixed_update_entities: Vec<Entity<dyn FixedUpdate>>,
+    renderable_entities: Vec<Entity<dyn Renderable>>,
+    interactive_entities: Vec<Entity<dyn Interactive>>,
     timestep: i64,
 }
 
@@ -127,8 +126,8 @@ impl Game {
     /// # Example
     /// ```
     /// use ctrait::{
-    ///     entity_slice,
-    ///     game::{Entity, Game},
+    ///     entity, entity_slice,
+    ///     game::Game,
     ///     traits::Update
     /// };
     ///
@@ -136,11 +135,11 @@ impl Game {
     /// impl Update for A {
     ///     fn update(&mut self, _: f64) {}
     /// }
-    /// let a = Entity::new(A {});
+    /// let a = entity!(A {});
     /// Game::default()
     ///     .with_update_entities(&entity_slice!(Update, a));
     /// ```
-    pub fn with_update_entities(mut self, entities: &[EntityType<dyn Update>]) -> Self {
+    pub fn with_update_entities(mut self, entities: &[Entity<dyn Update>]) -> Self {
         self.update_entities = entities.to_vec();
         self
     }
@@ -150,8 +149,8 @@ impl Game {
     /// # Example
     /// ```
     /// use ctrait::{
-    ///     entity_slice,
-    ///     game::{Entity, Game},
+    ///     entity, entity_slice,
+    ///     game::Game,
     ///     traits::FixedUpdate
     /// };
     ///
@@ -159,11 +158,11 @@ impl Game {
     /// impl FixedUpdate for A {
     ///     fn fixed_update(&mut self, _: f64) {}
     /// }
-    /// let a = Entity::new(A {});
+    /// let a = entity!(A {});
     /// Game::default()
     ///     .with_fixed_update_entities(&entity_slice!(FixedUpdate, a));
     /// ```
-    pub fn with_fixed_update_entities(mut self, entities: &[EntityType<dyn FixedUpdate>]) -> Self {
+    pub fn with_fixed_update_entities(mut self, entities: &[Entity<dyn FixedUpdate>]) -> Self {
         self.fixed_update_entities = entities.to_vec();
         self
     }
@@ -174,8 +173,8 @@ impl Game {
     /// ```
     /// use ctrait::{
     ///     camera::Camera,
-    ///     entity_slice,
-    ///     game::{Entity, Game},
+    ///     entity, entity_slice,
+    ///     game::Game,
     ///     renderer::CanvasWindow,
     ///     traits::Renderable
     /// };
@@ -184,11 +183,11 @@ impl Game {
     /// impl Renderable for A {
     ///     fn render(&self, _: &Camera, _: &mut CanvasWindow) {}
     /// }
-    /// let a = Entity::new(A {});
+    /// let a = entity!(A {});
     /// Game::default()
     ///     .with_renderable_entities(&entity_slice!(Renderable, a));
     /// ```
-    pub fn with_renderable_entities(mut self, entities: &[EntityType<dyn Renderable>]) -> Self {
+    pub fn with_renderable_entities(mut self, entities: &[Entity<dyn Renderable>]) -> Self {
         self.renderable_entities = entities.to_vec();
         self
     }
@@ -198,8 +197,8 @@ impl Game {
     /// # Example
     /// ```
     /// use ctrait::{
-    ///     entity_slice,
-    ///     game::{Entity, Game},
+    ///     entity, entity_slice,
+    ///     game::Game,
     ///     traits::Interactive,
     ///     Event
     /// };
@@ -208,11 +207,11 @@ impl Game {
     /// impl Interactive for A {
     ///     fn on_event(&mut self, _: &Event) {}
     /// }
-    /// let a = Entity::new(A {});
+    /// let a = entity!(A {});
     /// Game::default()
     ///     .with_interactive_entities(&entity_slice!(Interactive, a));
     /// ```
-    pub fn with_interactive_entities(mut self, entities: &[EntityType<dyn Interactive>]) -> Self {
+    pub fn with_interactive_entities(mut self, entities: &[Entity<dyn Interactive>]) -> Self {
         self.interactive_entities = entities.to_vec();
         self
     }
@@ -256,7 +255,7 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
-    use super::Entity;
+    use crate::entity;
 
     #[test]
     fn entity_deref() {
@@ -266,7 +265,7 @@ mod tests {
                 true
             }
         }
-        let alice = Entity::new(Alice {});
+        let alice = entity!(Alice {});
         // Should only work if entity can be dereferenced.
         assert!(alice.lock().unwrap().it_works());
     }

@@ -1,11 +1,10 @@
 use crate::{
     camera::Camera,
     error::CtraitResult,
-    game::{Entity, EntityType},
+    game::Entity,
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, render::Canvas, video::Window, EventPump};
-use std::sync::Arc;
 
 pub type CanvasWindow = Canvas<Window>;
 
@@ -14,12 +13,19 @@ pub struct Renderer {
     pub canvas: CanvasWindow,
     event_pump: EventPump,
     quit: bool,
-    camera: Option<EntityType<Camera>>,
+    camera: Option<Entity<Camera>>,
 }
 
 impl Renderer {
     /// Construct a new renderer.
     /// May return [`crate::error::CtraitError`] if [`sdl2`] fails to start.
+    ///
+    /// # Example
+    /// ```no_run
+    /// use ctrait::renderer::Renderer;
+    ///
+    /// let renderer = Renderer::initialize("Window title", 640, 480).unwrap();
+    /// ```
     pub fn initialize(title: &str, width: u32, height: u32) -> CtraitResult<Self> {
         let sdl_context = sdl2::init()?;
         let event_pump = sdl_context.event_pump()?;
@@ -40,15 +46,33 @@ impl Renderer {
 
     /// Attach a camera to the renderer.
     /// A camera is **required** to render [`Renderable`] entities.
+    ///
+    /// # Example
+    /// ```no_run
+    /// use ctrait::{camera::Camera, renderer::Renderer};
+    ///
+    /// let renderer = Renderer::initialize("Window title", 640, 480).unwrap()
+    ///     .with_camera(Camera::default());
+    /// ```
     pub fn with_camera(mut self, camera: Camera) -> Self {
-        self.camera = Some(Arc::clone(&Entity::new(camera)));
+        self.camera = Some(crate::entity_clone!(&crate::entity!(camera)));
         self
     }
 
-    /// Attach a reference counted camera.
+    /// Attach a reference counted camera to the renderer.
     /// Useful if you want to refer to the same camera elsewhere.
+    ///
+    /// # Example
+    /// ```no_run
+    /// use ctrait::{camera::Camera, entity, renderer::Renderer};
+    ///
+    /// let camera = entity!(Camera::default());
+    /// // camera can now be passed to other entities...
+    /// let renderer = Renderer::initialize("Window title", 640, 480).unwrap()
+    ///     .with_camera_entity(&camera);
+    /// ```
     pub fn with_camera_entity(mut self, camera: &Entity<Camera>) -> Self {
-        self.camera = Some(Arc::clone(&camera));
+        self.camera = Some(crate::entity_clone!(&camera));
         self
     }
 
@@ -58,7 +82,7 @@ impl Renderer {
     }
 
     // Poll for pending events. Will mark quit as true if quit event was received.
-    pub(crate) fn process_event(&mut self, entities: &mut Vec<EntityType<dyn Interactive>>) {
+    pub(crate) fn process_event(&mut self, entities: &mut Vec<Entity<dyn Interactive>>) {
         for event in self.event_pump.poll_iter() {
             if let Event::Quit { .. } = event {
                 self.quit = true;
@@ -71,7 +95,7 @@ impl Renderer {
     }
 
     // Render a vector of Rederable objects to canvas.
-    pub(crate) fn render(&mut self, entities: &mut Vec<EntityType<dyn Renderable>>) {
+    pub(crate) fn render(&mut self, entities: &mut Vec<Entity<dyn Renderable>>) {
         if let Some(camera) = &mut self.camera {
             let mut camera = camera.lock().unwrap();
             camera.update(&self.canvas);
