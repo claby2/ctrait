@@ -12,7 +12,7 @@ use timer::Timer;
 
 pub type EntityType<T> = Arc<Mutex<T>>;
 
-/// A New Type that represents a single game entity.
+/// A New Type of [`EntityType`] that represents a single game entity.
 #[derive(Debug)]
 pub struct Entity<T>(EntityType<T>);
 
@@ -31,7 +31,7 @@ impl<T> Entity<T> {
     }
 }
 
-/// Allows the [`Entity`] to be dereferenced so its methods can be used.
+/// Allows the [`Entity`] to be dereferenced and directly accessed.
 ///
 /// # Example
 /// ```
@@ -115,6 +115,7 @@ impl Game {
     pub const DEFAULT_TIMESTEP: i64 = ((1.0 / 50.0) * 1000.0) as i64;
 
     /// Customize the delay in milliseconds between [`FixedUpdate::fixed_update`] method calls.
+    ///
     /// Default timestep is equal to [`Self::DEFAULT_TIMESTEP`].
     pub fn with_timestep(mut self, timestep: i64) -> Self {
         self.timestep = timestep;

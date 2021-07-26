@@ -4,7 +4,7 @@ pub mod game;
 pub mod rect;
 pub mod renderer;
 pub mod traits;
-pub mod vector;
 
 // Re-export.
+pub use cgmath as math;
 pub use sdl2::{event::Event, keyboard::Keycode, pixels::Color};

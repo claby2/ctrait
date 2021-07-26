@@ -1,10 +1,11 @@
 use crate::{
     camera::Camera,
     error::CtraitResult,
-    game::EntityType,
+    game::{Entity, EntityType},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, render::Canvas, video::Window, EventPump};
+use std::sync::Arc;
 
 pub type CanvasWindow = Canvas<Window>;
 
@@ -13,7 +14,7 @@ pub struct Renderer {
     pub canvas: CanvasWindow,
     event_pump: EventPump,
     quit: bool,
-    camera: Option<Camera>,
+    camera: Option<EntityType<Camera>>,
 }
 
 impl Renderer {
@@ -40,7 +41,14 @@ impl Renderer {
     /// Attach a camera to the renderer.
     /// A camera is **required** to render [`Renderable`] entities.
     pub fn with_camera(mut self, camera: Camera) -> Self {
-        self.camera = Some(camera);
+        self.camera = Some(Arc::clone(&Entity::new(camera)));
+        self
+    }
+
+    /// Attach a reference counted camera.
+    /// Useful if you want to refer to the same camera elsewhere.
+    pub fn with_camera_entity(mut self, camera: &Entity<Camera>) -> Self {
+        self.camera = Some(Arc::clone(&camera));
         self
     }
 
@@ -65,11 +73,14 @@ impl Renderer {
     // Render a vector of Rederable objects to canvas.
     pub(crate) fn render(&mut self, entities: &mut Vec<EntityType<dyn Renderable>>) {
         if let Some(camera) = &mut self.camera {
-            camera.update(&self.canvas);
+            camera.lock().unwrap().update(&self.canvas);
             self.canvas.set_draw_color(Color::BLACK);
             self.canvas.clear();
             for entity in entities {
-                entity.lock().unwrap().render(&camera, &mut self.canvas);
+                entity
+                    .lock()
+                    .unwrap()
+                    .render(&camera.lock().unwrap(), &mut self.canvas);
             }
             self.canvas.present();
         }
