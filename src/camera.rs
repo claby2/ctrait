@@ -32,7 +32,7 @@ impl Camera {
         &self.canvas_size
     }
 
-    /// Returns whether or not the given rectangle would be visible on the canvas.
+    /// Returns whether the given rectangle would be visible on the canvas.
     /// The given rectangle should be derived from [`crate::rect::Rect::to_canvas_rect`].
     ///
     /// # Example
@@ -52,6 +52,16 @@ impl Camera {
             && (rect.x + rect.width() as i32) > 0
             && rect.y < self.canvas_size.y as i32
             && (rect.y + rect.height() as i32) > 0
+    }
+
+    /// Convert the given canvas position to its equivalent world position.
+    pub fn get_world_position(&self, canvas_position: Vector2<i32>) -> Vector2<i32> {
+        canvas_position + self.position - Vector2::cast(&(self.canvas_size / 2)).unwrap()
+    }
+
+    /// Convert the given world position to its equivalent canvas position.
+    pub fn get_canvas_position(&self, world_position: Vector2<i32>) -> Vector2<i32> {
+        world_position - self.position + Vector2::cast(&(self.canvas_size / 2)).unwrap()
     }
 
     pub(crate) fn update(&mut self, canvas: &CanvasWindow) {
@@ -82,5 +92,31 @@ mod tests {
         };
         // Rectangle should be located in the middle of canvas.
         assert!(camera.is_canvas_rect_visible(&CanvasRect::new(20, 20, 10, 10)));
+    }
+
+    #[test]
+    fn camera_get_world_position() {
+        let camera = Camera {
+            canvas_size: Vector2::new(50, 50),
+            ..Default::default()
+        };
+        let canvas_position = Vector2::new(35, 35);
+        assert_eq!(
+            camera.get_world_position(canvas_position),
+            Vector2::new(10, 10)
+        );
+    }
+
+    #[test]
+    fn camera_get_canvas_position() {
+        let camera = Camera {
+            canvas_size: Vector2::new(50, 50),
+            ..Default::default()
+        };
+        let world_position = Vector2::new(10, 10);
+        assert_eq!(
+            camera.get_canvas_position(world_position),
+            Vector2::new(35, 35)
+        );
     }
 }
