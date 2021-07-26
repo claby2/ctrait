@@ -57,7 +57,7 @@ impl Renderer {
                 break;
             }
             entities.iter_mut().for_each(|entity| {
-                entity.borrow_mut().on_event(&event);
+                entity.lock().unwrap().on_event(&event);
             });
         }
     }
@@ -69,7 +69,7 @@ impl Renderer {
             self.canvas.set_draw_color(Color::BLACK);
             self.canvas.clear();
             for entity in entities {
-                entity.borrow_mut().render(&camera, &mut self.canvas);
+                entity.lock().unwrap().render(&camera, &mut self.canvas);
             }
             self.canvas.present();
         }

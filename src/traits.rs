@@ -8,6 +8,16 @@ pub trait Update {
     fn update(&mut self, delta: f64);
 }
 
+/// A type that should update every fixed timestep.
+///
+/// This should be used instead of [`Update`] for time-dependent operations.
+pub trait FixedUpdate: Send {
+    /// `delta` is the number of seconds since the last update.
+    /// It should be approximately equal to the default timestep
+    /// [`crate::game::Game::DEFAULT_TIMESTEP`].
+    fn fixed_update(&mut self, delta: f64);
+}
+
 /// A type that is responsive to user events.
 pub trait Interactive {
     /// Called for each event in the event queue.
