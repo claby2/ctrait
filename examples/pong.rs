@@ -28,7 +28,7 @@ impl Paddle {
 
     fn new(x: i32, up_key: Keycode, down_key: Keycode) -> Self {
         Self {
-            rect: Rect::new(x, -40, 20, 80),
+            rect: Rect::with_center(x, 0, 20, 80),
             movement: Movement::default(),
             up_key,
             down_key,
@@ -98,7 +98,7 @@ impl Ball {
     const SPEED: f64 = 800.0;
     fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
         Self {
-            rect: Rect::new(-5, -5, 10, 10),
+            rect: Rect::with_center(0, 0, 10, 10),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
             paddle1,

@@ -19,9 +19,8 @@ struct Cursor {
 impl Cursor {
     const SIZE: u32 = 100;
     fn new(camera: Entity<Camera>) -> Self {
-        let center = -((Self::SIZE / 2) as i32);
         Self {
-            rect: Rect::new(center, center, Self::SIZE, Self::SIZE),
+            rect: Rect::with_center(0, 0, Self::SIZE, Self::SIZE),
             cursor_position: Vector2::new(0, 0),
             camera,
         }
@@ -73,7 +72,7 @@ struct Detector {
 impl Detector {
     fn new(cursor: Entity<Cursor>) -> Self {
         Self {
-            rect: Rect::new(-150, -150, 300, 300),
+            rect: Rect::with_center(0, 0, 300, 300),
             colliding: false,
             cursor,
         }
