@@ -1,14 +1,13 @@
 use ctrait::{
     camera::Camera,
-    entity_slice,
-    game::{Entity, EntityType, Game},
+    entity, entity_clone, entity_slice,
+    game::{Entity, Game},
     math::Vector2,
     rect::Rect,
     renderer::{CanvasWindow, Renderer},
     traits::{Interactive, Renderable, Update},
     Color, Event,
 };
-use std::sync::Arc;
 
 #[derive(Debug)]
 struct Cursor {
@@ -68,11 +67,11 @@ impl Renderable for Cursor {
 struct Detector {
     rect: Rect,
     colliding: bool,
-    cursor: EntityType<Cursor>,
+    cursor: Entity<Cursor>,
 }
 
 impl Detector {
-    fn new(cursor: EntityType<Cursor>) -> Self {
+    fn new(cursor: Entity<Cursor>) -> Self {
         Self {
             rect: Rect::new(-150, -150, 300, 300),
             colliding: false,
@@ -104,12 +103,12 @@ impl Renderable for Detector {
 }
 
 fn main() {
-    let camera = Entity::new(Camera::default());
+    let camera = entity!(Camera::default());
     let mut renderer = Renderer::initialize("Collision", 640, 480)
         .unwrap()
         .with_camera_entity(&camera);
-    let cursor = Entity::new(Cursor::new(camera));
-    let detector = Entity::new(Detector::new(Arc::clone(&cursor)));
+    let cursor = entity!(Cursor::new(camera));
+    let detector = entity!(Detector::new(entity_clone!(cursor)));
     Game::default()
         .with_update_entities(&entity_slice!(Update, cursor, detector))
         .with_interactive_entities(&entity_slice!(Interactive, cursor))
