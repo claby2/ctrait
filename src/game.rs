@@ -258,7 +258,7 @@ mod tests {
     use crate::entity;
 
     #[test]
-    fn entity_deref() {
+    fn entity_access() {
         struct Alice;
         impl Alice {
             fn it_works(&self) -> bool {
@@ -266,7 +266,6 @@ mod tests {
             }
         }
         let alice = entity!(Alice {});
-        // Should only work if entity can be dereferenced.
         assert!(alice.lock().unwrap().it_works());
     }
 }
