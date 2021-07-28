@@ -174,10 +174,17 @@ fn main() {
         entity_clone!(paddle1),
         entity_clone!(paddle2)
     ));
-    Game::default()
-        .with_update_entities(&entity_slice!(Update, ball))
-        .with_fixed_update_entities(&entity_slice!(FixedUpdate, paddle1, paddle2, ball))
-        .with_renderable_entities(&entity_slice!(Renderable, paddle1, paddle2, ball))
-        .with_interactive_entities(&entity_slice!(Interactive, paddle1, paddle2))
-        .start(&mut renderer);
+    let mut game = Game::default();
+    game.update_entities.push(&entity_clone!(Update, ball));
+    game.fixed_update_entities.extend_from_slice(&entity_slice!(
+        FixedUpdate,
+        paddle1,
+        paddle2,
+        ball
+    ));
+    game.renderable_entities
+        .extend_from_slice(&entity_slice!(Renderable, paddle1, paddle2, ball));
+    game.interactive_entities
+        .extend_from_slice(&entity_slice!(Interactive, paddle1, paddle2));
+    game.start(&mut renderer);
 }

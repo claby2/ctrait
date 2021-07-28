@@ -1,7 +1,7 @@
 use crate::{
     camera::Camera,
     error::CtraitResult,
-    game::Entity,
+    game::{Entity, EntityContainer},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, render::Canvas, video::Window, EventPump};
@@ -82,27 +82,35 @@ impl Renderer {
     }
 
     // Poll for pending events. Will mark quit as true if quit event was received.
-    pub(crate) fn process_event(&mut self, entities: &mut Vec<Entity<dyn Interactive>>) {
+    pub(crate) fn process_event(&mut self, entities: &mut EntityContainer<dyn Interactive>) {
         for event in self.event_pump.poll_iter() {
             if let Event::Quit { .. } = event {
                 self.quit = true;
                 break;
             }
             entities
+                .access()
+                .lock()
+                .unwrap()
                 .iter_mut()
-                .for_each(|entity| entity.lock().unwrap().on_event(&event));
+                .for_each(|entity| entity.upgrade().unwrap().lock().unwrap().on_event(&event));
         }
     }
 
     // Render a vector of Rederable objects to canvas.
-    pub(crate) fn render(&mut self, entities: &mut Vec<Entity<dyn Renderable>>) {
+    pub(crate) fn render(&mut self, entities: &mut EntityContainer<dyn Renderable>) {
         if let Some(camera) = &mut self.camera {
             let mut camera = camera.lock().unwrap();
             camera.update(&self.canvas);
             self.canvas.set_draw_color(Color::BLACK);
             self.canvas.clear();
-            for entity in entities {
-                entity.lock().unwrap().render(&camera, &mut self.canvas);
+            for entity in entities.access().lock().unwrap().iter() {
+                entity
+                    .upgrade()
+                    .unwrap()
+                    .lock()
+                    .unwrap()
+                    .render(&camera, &mut self.canvas);
             }
             self.canvas.present();
         }

@@ -108,9 +108,12 @@ fn main() {
         .with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
     let detector = entity!(Detector::new(entity_clone!(cursor)));
-    Game::default()
-        .with_update_entities(&entity_slice!(Update, cursor, detector))
-        .with_interactive_entities(&entity_slice!(Interactive, cursor))
-        .with_renderable_entities(&entity_slice!(Renderable, detector, cursor))
-        .start(&mut renderer);
+    let mut game = Game::default();
+    game.update_entities
+        .extend_from_slice(&entity_slice!(Update, cursor, detector));
+    game.interactive_entities
+        .push(&entity_clone!(Interactive, cursor));
+    game.renderable_entities
+        .extend_from_slice(&entity_slice!(Renderable, detector, cursor));
+    game.start(&mut renderer);
 }
