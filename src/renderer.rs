@@ -83,13 +83,13 @@ impl Renderer {
 
     // Poll for pending events. Will mark quit as true if quit event was received.
     pub(crate) fn process_event(&mut self, entities: &mut EntityContainer<dyn Interactive>) {
+        let entities = entities.access();
         for event in self.event_pump.poll_iter() {
             if let Event::Quit { .. } = event {
                 self.quit = true;
                 break;
             }
             entities
-                .access()
                 .lock()
                 .unwrap()
                 .iter_mut()
