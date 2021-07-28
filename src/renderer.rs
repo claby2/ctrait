@@ -118,7 +118,7 @@ impl Renderer {
     /// )).unwrap();
     /// ```
     pub fn new(config: Option<RendererConfig>) -> CtraitResult<Self> {
-        let config = config.unwrap_or_else(|| RendererConfig::default());
+        let config = config.unwrap_or_else(RendererConfig::default);
         let sdl_context = sdl2::init()?;
         let event_pump = sdl_context.event_pump()?;
         let video_subsystem = sdl_context.video()?;
