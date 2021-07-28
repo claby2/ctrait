@@ -140,9 +140,7 @@ impl Renderable for Spawner {
 
 fn main() {
     let mut game = Game::default();
-    let mut renderer = Renderer::initialize("Instantiation", 640, 480)
-        .unwrap()
-        .with_camera(Camera::default());
+    let mut renderer = Renderer::new(None).unwrap().with_camera(Camera::default());
     let spawner = entity!(Spawner::new(
         &game.renderable_entities,
         &game.fixed_update_entities

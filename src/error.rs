@@ -1,4 +1,4 @@
-use sdl2::{render::UpdateTextureError, IntegerOrSdlError};
+use sdl2::{render::UpdateTextureError, video::WindowBuildError, IntegerOrSdlError};
 use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 
@@ -8,6 +8,7 @@ pub type CtraitResult<T> = Result<T, CtraitError>;
 pub enum CtraitError {
     IntegerOr(IntegerOrSdlError),
     UpdateTexture(UpdateTextureError),
+    WindowBuild(WindowBuildError),
     Other(String),
 }
 
@@ -28,6 +29,12 @@ impl From<IntegerOrSdlError> for CtraitError {
 impl From<UpdateTextureError> for CtraitError {
     fn from(err: UpdateTextureError) -> Self {
         Self::UpdateTexture(err)
+    }
+}
+
+impl From<WindowBuildError> for CtraitError {
+    fn from(err: WindowBuildError) -> Self {
+        Self::WindowBuild(err)
     }
 }
 

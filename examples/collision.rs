@@ -103,9 +103,7 @@ impl Renderable for Detector {
 
 fn main() {
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::initialize("Collision", 640, 480)
-        .unwrap()
-        .with_camera_entity(&camera);
+    let mut renderer = Renderer::new(None).unwrap().with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
     let detector = entity!(Detector::new(entity_clone!(cursor)));
     let mut game = Game::default();
