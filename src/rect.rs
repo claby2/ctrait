@@ -37,6 +37,11 @@ impl Rect {
         )
     }
 
+    /// Return the center position as a [`Vector2`].
+    pub fn center(&self) -> Vector2<i32> {
+        self.position + Vector2::cast(&(self.size / 2)).unwrap()
+    }
+
     /// Copies `self` into a new [`CanvasRect`] relative to the given camera.
     ///
     /// # Example
@@ -98,6 +103,12 @@ mod tests {
     fn rect_with_center() {
         let rect = Rect::with_center(0, 0, 10, 20);
         assert_eq!(rect, Rect::new(-5, -10, 10, 20));
+    }
+
+    #[test]
+    fn rect_center() {
+        let rect = Rect::new(0, 0, 10, 20);
+        assert_eq!(rect.center(), Vector2::new(5, 10));
     }
 
     #[test]

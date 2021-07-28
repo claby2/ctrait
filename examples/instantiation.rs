@@ -93,7 +93,7 @@ impl Interactive for Spawner {
                     self.movement.right = true;
                 } else if *keycode == Keycode::Space {
                     // Instantiate a block.
-                    let block = entity!(Block::new(&self.rect.position));
+                    let block = entity!(Block::new(&self.rect.center()));
                     self.renderable_entities
                         .push(&entity_clone!(Renderable, block));
                     self.fixed_update_entities
