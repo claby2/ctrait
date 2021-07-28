@@ -66,17 +66,17 @@ macro_rules! entity_clone {
 ///     camera::Camera,
 ///     entity, entity_slice,
 ///     game::Game,
-///     renderer::CanvasWindow,
+///     renderer::WindowCanvas,
 ///     traits::Renderable
 /// };
 ///
 /// struct A;
 /// impl Renderable for A {
-///     fn render(&self, _: &Camera, _: &mut CanvasWindow) {}
+///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
 /// }
 /// struct B;
 /// impl Renderable for B {
-///     fn render(&self, _: &Camera, _: &mut CanvasWindow) {}
+///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
 /// }
 ///
 /// let a = entity!(A {});

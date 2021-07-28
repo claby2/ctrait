@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{CanvasWindow, Renderer},
+    renderer::{Renderer, WindowCanvas},
     traits::{Interactive, Renderable, Update},
     Color, Event,
 };
@@ -20,7 +20,7 @@ impl Cursor {
     const SIZE: u32 = 100;
     fn new(camera: Entity<Camera>) -> Self {
         Self {
-            rect: Rect::with_center(0, 0, Self::SIZE, Self::SIZE),
+            rect: Rect::from_center(0, 0, Self::SIZE, Self::SIZE).with_color(&Color::WHITE),
             cursor_position: Vector2::new(0, 0),
             camera,
         }
@@ -53,12 +53,8 @@ impl Update for Cursor {
 }
 
 impl Renderable for Cursor {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            canvas.set_draw_color(Color::WHITE);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 
@@ -72,7 +68,7 @@ struct Detector {
 impl Detector {
     fn new(cursor: Entity<Cursor>) -> Self {
         Self {
-            rect: Rect::with_center(0, 0, 300, 300),
+            rect: Rect::from_center(0, 0, 300, 300),
             colliding: false,
             cursor,
         }
@@ -82,22 +78,17 @@ impl Detector {
 impl Update for Detector {
     fn update(&mut self, _: f64) {
         self.colliding = self.cursor.lock().unwrap().rect.intersects(&self.rect);
+        self.rect.color = Some(if self.colliding {
+            Color::GREEN
+        } else {
+            Color::WHITE
+        });
     }
 }
 
 impl Renderable for Detector {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            // Change color to detect collision.
-            let color = if self.colliding {
-                Color::GREEN
-            } else {
-                Color::WHITE
-            };
-            canvas.set_draw_color(color);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::{camera::Camera, renderer::CanvasWindow};
+use crate::{camera::Camera, renderer::WindowCanvas};
 use sdl2::event::Event;
 
 /// A type that should update every game loop iteration.
@@ -27,5 +27,5 @@ pub trait Interactive: Send {
 /// A type that can be rendered.
 pub trait Renderable: Send {
     /// Called by [`crate::renderer::Renderer`].
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow);
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas);
 }

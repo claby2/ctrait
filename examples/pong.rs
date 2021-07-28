@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{CanvasWindow, Renderer},
+    renderer::{Renderer, WindowCanvas},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -28,7 +28,7 @@ impl Paddle {
 
     fn new(x: i32, up_key: Keycode, down_key: Keycode) -> Self {
         Self {
-            rect: Rect::with_center(x, 0, 20, 80),
+            rect: Rect::from_center(x, 0, 20, 80).with_color(&Color::WHITE),
             movement: Movement::default(),
             up_key,
             down_key,
@@ -76,12 +76,8 @@ impl Interactive for Paddle {
 }
 
 impl Renderable for Paddle {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            canvas.set_draw_color(Color::WHITE);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 
@@ -98,7 +94,7 @@ impl Ball {
     const SPEED: f64 = 800.0;
     fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
         Self {
-            rect: Rect::with_center(0, 0, 10, 10),
+            rect: Rect::from_center(0, 0, 10, 10).with_color(&Color::WHITE),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
             paddle1,
@@ -120,15 +116,16 @@ impl Ball {
 impl Update for Ball {
     fn update(&mut self, _: f64) {
         let camera = self.camera.lock().unwrap();
-        let canvas_rect = self.rect.to_canvas_rect(&camera);
+        let canvas_position = camera.get_canvas_position(self.rect.position);
         // Check if the Ball's x position is outside of the canvas.
-        if canvas_rect.x < 0 || canvas_rect.x as u32 + canvas_rect.width() >= camera.canvas_size().x
+        if canvas_position.x < 0
+            || canvas_position.x as u32 + self.rect.size.x >= camera.canvas_size().x
         {
-            // Reset position.
-            self.rect.position = Vector2::new(-5, -5);
+            // Reset position to center.
+            self.rect.center_on(0, 0);
             self.velocity.y = 0.0;
-        } else if canvas_rect.y < 0
-            || canvas_rect.y as u32 + canvas_rect.height() >= camera.canvas_size().y
+        } else if canvas_position.y < 0
+            || canvas_position.y as u32 + self.rect.size.y >= camera.canvas_size().y
         {
             self.velocity.y *= -1.0;
         } else {
@@ -152,12 +149,8 @@ impl FixedUpdate for Ball {
 }
 
 impl Renderable for Ball {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            canvas.set_draw_color(Color::WHITE);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 

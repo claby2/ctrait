@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, EntityContainer, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{CanvasWindow, Renderer},
+    renderer::{Renderer, WindowCanvas},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -19,7 +19,7 @@ impl Block {
 
     fn new(position: &Vector2<i32>) -> Self {
         Self {
-            rect: Rect::with_center(position.x, position.y, 50, 50),
+            rect: Rect::from_center(position.x, position.y, 50, 50).with_color(&Color::GRAY),
         }
     }
 }
@@ -31,12 +31,8 @@ impl FixedUpdate for Block {
 }
 
 impl Renderable for Block {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            canvas.set_draw_color(Color::WHITE);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 
@@ -55,14 +51,14 @@ struct Spawner {
 }
 
 impl Spawner {
-    const SPEED: f64 = 1000.0;
+    const SPEED: f64 = 500.0;
 
     fn new(
         renderable_entities: &EntityContainer<dyn Renderable>,
         fixed_update_entities: &EntityContainer<dyn FixedUpdate>,
     ) -> Self {
         Self {
-            rect: Rect::with_center(0, -200, 100, 20),
+            rect: Rect::from_center(0, -200, 100, 20).with_color(&Color::GREEN),
             movement: Movement::default(),
             renderable_entities: renderable_entities.clone(),
             fixed_update_entities: fixed_update_entities.clone(),
@@ -129,12 +125,8 @@ impl FixedUpdate for Spawner {
 }
 
 impl Renderable for Spawner {
-    fn render(&self, camera: &Camera, canvas: &mut CanvasWindow) {
-        let canvas_rect = self.rect.to_canvas_rect(camera);
-        if camera.is_canvas_rect_visible(&canvas_rect) {
-            canvas.set_draw_color(Color::WHITE);
-            canvas.fill_rect(canvas_rect).unwrap();
-        }
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+        self.rect.render(camera, canvas);
     }
 }
 

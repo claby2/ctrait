@@ -4,11 +4,8 @@ use crate::{
     game::{Entity, EntityContainer},
     traits::{Interactive, Renderable},
 };
-use sdl2::{
-    self, event::Event, pixels::Color, render::Canvas, video::Window, EventPump, VideoSubsystem,
-};
-
-pub type CanvasWindow = Canvas<Window>;
+pub use sdl2::render::WindowCanvas;
+use sdl2::{self, event::Event, pixels::Color, video::Window, EventPump, VideoSubsystem};
 
 /// Configuration for [`Renderer`].
 #[derive(Debug)]
@@ -85,7 +82,7 @@ impl Default for RendererConfig {
 
 /// Renders entities.
 pub struct Renderer {
-    pub canvas: CanvasWindow,
+    pub canvas: WindowCanvas,
     event_pump: EventPump,
     quit: bool,
     camera: Option<Entity<Camera>>,
