@@ -128,12 +128,16 @@ impl<T: ?Sized> EntityContainer<T> {
         self.0.lock().unwrap().clear();
     }
 
-    pub(crate) fn access(&self) -> &Arc<Mutex<Vec<WeakEntity<T>>>> {
+    fn prune(entities: &mut Vec<WeakEntity<T>>) {
         // Whenever the entities are accessed, check if inner values for each entity exists.
         // If an inner value does not exist, it indicates that the original entity has been
         // dropped. Thus, it should be removed from the container as well.
-        let entities = &mut self.0.lock().unwrap();
         entities.retain(|entity| entity.upgrade().is_some());
+    }
+
+    pub(crate) fn access(&self) -> &Arc<Mutex<Vec<WeakEntity<T>>>> {
+        let entities = &mut self.0.lock().unwrap();
+        Self::prune(entities);
         &self.0
     }
 }
@@ -181,25 +185,19 @@ impl Game {
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
-        let fixed_update_entities = Arc::clone(&self.fixed_update_entities.access());
+        let fixed_update_entities = Arc::clone(&self.fixed_update_entities.0);
         let _guard = timer.schedule_repeating(Duration::milliseconds(self.timestep), move || {
-            // Iterate through fixed update entities and call fixed_update method.
-            // Since the container is an Arc clone, it cannot be accessed through the conventional
-            // EntityContainer access method. Hence, it is important to make sure that the inner
-            // value for each FixedUpdate entity still exists.
-            fixed_update_entities.lock().unwrap().retain(|entity| {
-                if let Some(entity) = entity.upgrade() {
-                    entity
-                        .lock()
-                        .unwrap()
-                        .fixed_update(fixed_update_instant.elapsed().as_secs_f64());
-
-                    true
-                } else {
-                    // The inner value of the entity has been dropped. Return false to remove the
-                    // entity from the container.
-                    false
-                }
+            let mut fixed_update_entities = fixed_update_entities.lock().unwrap();
+            // Since fixed_update_entities is an Arc clone, EntityContainer::access cannot be used.
+            // Use EntityContainer::prune instead.
+            EntityContainer::prune(&mut fixed_update_entities);
+            fixed_update_entities.iter().for_each(|entity| {
+                entity
+                    .upgrade()
+                    .unwrap()
+                    .lock()
+                    .unwrap()
+                    .fixed_update(fixed_update_instant.elapsed().as_secs_f64())
             });
             fixed_update_instant = Instant::now();
         });
@@ -275,7 +273,20 @@ mod tests {
     }
 
     #[test]
-    fn game_eneity_container_access() {
+    fn game_entity_prune() {
+        let a = entity!(Test {});
+        let b = entity!(Test {});
+        let mut entities = vec![Arc::downgrade(&a), Arc::downgrade(&b)];
+        drop(a);
+        EntityContainer::prune(&mut entities);
+        assert_eq!(entities.len(), 1);
+        drop(b);
+        EntityContainer::prune(&mut entities);
+        assert!(entities.is_empty());
+    }
+
+    #[test]
+    fn game_entity_container_access() {
         let a = entity!(Test {});
         let b = entity!(Test {});
         let container = EntityContainer::default();
@@ -289,5 +300,8 @@ mod tests {
         drop(a);
         container.access();
         assert_eq!(container.0.lock().unwrap().len(), 1);
+        drop(b);
+        container.access();
+        assert!(container.0.lock().unwrap().is_empty());
     }
 }
