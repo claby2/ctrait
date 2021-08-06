@@ -1,4 +1,4 @@
-use crate::{camera::Camera, renderer::WindowCanvas};
+use crate::{camera::Camera, render::WindowCanvas};
 use sdl2::event::Event;
 
 /// A type that should update every game loop iteration.

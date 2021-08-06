@@ -1,5 +1,5 @@
 use crate::{
-    renderer::Renderer,
+    render::Renderer,
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
 use chrono::Duration;
@@ -66,7 +66,7 @@ macro_rules! entity_clone {
 ///     camera::Camera,
 ///     entity, entity_slice,
 ///     game::Game,
-///     renderer::WindowCanvas,
+///     render::WindowCanvas,
 ///     traits::Renderable
 /// };
 ///

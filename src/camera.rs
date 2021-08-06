@@ -1,4 +1,4 @@
-use crate::{math::Vector2, renderer::WindowCanvas};
+use crate::{math::Vector2, render::WindowCanvas};
 
 /// Camera that displays the entities rendered to the canvas.
 #[derive(Debug)]

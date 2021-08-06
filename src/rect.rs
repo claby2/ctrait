@@ -1,4 +1,4 @@
-use crate::{camera::Camera, math::Vector2, renderer::WindowCanvas, traits::Renderable};
+use crate::{camera::Camera, math::Vector2, render::WindowCanvas, traits::Renderable};
 use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 
 /// A rectangle relative to world coordinates.
