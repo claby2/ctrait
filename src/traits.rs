@@ -26,6 +26,6 @@ pub trait Interactive: Send {
 
 /// A type that can be rendered.
 pub trait Renderable: Send {
-    /// Called by [`crate::renderer::Renderer`].
+    /// Called by [`crate::render::Renderer`].
     fn render(&self, camera: &Camera, canvas: &mut WindowCanvas);
 }

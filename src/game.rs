@@ -1,4 +1,5 @@
 use crate::{
+    error::CtraitResult,
     render::Renderer,
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
@@ -181,7 +182,40 @@ impl Game {
 
     /// Start the game with the given renderer.
     /// This will consume the game and block until a quit signal has been sent.
-    pub fn start(&mut self, renderer: &mut Renderer) {
+    pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
+        let sdl_context = sdl2::init()?;
+        let mut event_pump = sdl_context.event_pump()?;
+        let video_subsystem = sdl_context.video()?;
+        let window = renderer.config.get_window(&video_subsystem)?;
+        let mut canvas = window.into_canvas().build()?;
+        self.fixed_update();
+        // Start standard game loop.
+        let mut standard_instant = Instant::now();
+        loop {
+            renderer.process_event(&mut event_pump, &mut self.interactive_entities);
+            self.update_entities
+                .access()
+                .lock()
+                .unwrap()
+                .iter()
+                .for_each(|entity| {
+                    entity
+                        .upgrade()
+                        .unwrap()
+                        .lock()
+                        .unwrap()
+                        .update(standard_instant.elapsed().as_secs_f64())
+                });
+            standard_instant = Instant::now();
+            if renderer.has_quit() {
+                break;
+            }
+            renderer.render(&mut canvas, &mut self.renderable_entities);
+        }
+        Ok(())
+    }
+
+    fn fixed_update(&mut self) {
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
@@ -201,29 +235,6 @@ impl Game {
             });
             fixed_update_instant = Instant::now();
         });
-        // Start standard game loop.
-        let mut standard_instant = Instant::now();
-        loop {
-            renderer.process_event(&mut self.interactive_entities);
-            self.update_entities
-                .access()
-                .lock()
-                .unwrap()
-                .iter()
-                .for_each(|entity| {
-                    entity
-                        .upgrade()
-                        .unwrap()
-                        .lock()
-                        .unwrap()
-                        .update(standard_instant.elapsed().as_secs_f64())
-                });
-            standard_instant = Instant::now();
-            if renderer.has_quit() {
-                break;
-            }
-            renderer.render(&mut self.renderable_entities);
-        }
     }
 }
 

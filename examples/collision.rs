@@ -94,7 +94,7 @@ impl Renderable for Detector {
 
 fn main() {
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::new(None).unwrap().with_camera_entity(&camera);
+    let mut renderer = Renderer::default().with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
     let detector = entity!(Detector::new(entity_clone!(cursor)));
     let mut game = Game::default();
@@ -104,5 +104,5 @@ fn main() {
         .push(&entity_clone!(Interactive, cursor));
     game.renderable_entities
         .extend_from_slice(&entity_slice!(Renderable, detector, cursor));
-    game.start(&mut renderer);
+    game.start(&mut renderer).unwrap();
 }

@@ -132,7 +132,7 @@ impl Renderable for Spawner {
 
 fn main() {
     let mut game = Game::default();
-    let mut renderer = Renderer::new(None).unwrap().with_camera(Camera::default());
+    let mut renderer = Renderer::default().with_camera(Camera::default());
     let spawner = entity!(Spawner::new(
         &game.renderable_entities,
         &game.fixed_update_entities
@@ -146,5 +146,5 @@ fn main() {
         .push(&entity_clone!(FixedUpdate, spawner));
     game.renderable_entities
         .push(&entity_clone!(Renderable, spawner));
-    game.start(&mut renderer);
+    game.start(&mut renderer).unwrap();
 }
