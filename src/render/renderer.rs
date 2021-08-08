@@ -10,7 +10,6 @@ use sdl2::{self, event::Event, pixels::Color, EventPump};
 #[derive(Debug)]
 pub struct Renderer {
     pub config: RendererConfig,
-    texture_paths: Vec<String>,
     quit: bool,
     camera: Option<Entity<Camera>>,
 }
@@ -45,18 +44,9 @@ impl Renderer {
     pub fn new(config: RendererConfig) -> Self {
         Self {
             config,
-            texture_paths: Vec::new(),
             quit: false,
             camera: None,
         }
-    }
-
-    pub fn with_texture_paths(mut self, textures: &[&str]) {
-        self.texture_paths = textures.iter().map(|s| s.to_string()).collect();
-    }
-
-    pub fn texture_paths(&mut self) -> &Vec<String> {
-        &self.texture_paths
     }
 
     /// Attach a camera to the renderer.
@@ -137,5 +127,23 @@ impl Renderer {
             }
             layer.canvas.present();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Camera, Renderer};
+
+    #[test]
+    fn renderer_with_camera() {
+        let renderer = Renderer::default().with_camera(Camera::default());
+        assert!(renderer.camera.is_some());
+    }
+
+    #[test]
+    fn renderer_with_camera_entity() {
+        let camera = crate::entity!(Camera::default());
+        let renderer = Renderer::default().with_camera_entity(&camera);
+        assert!(renderer.camera.is_some());
     }
 }

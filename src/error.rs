@@ -16,7 +16,13 @@ impl Error for CtraitError {}
 
 impl Display for CtraitError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        writeln!(f, "{}", self)
+        use CtraitError::*;
+        match self {
+            IntegerOr(ref e) => e.fmt(f),
+            UpdateTexture(ref e) => e.fmt(f),
+            WindowBuild(ref e) => e.fmt(f),
+            Other(ref e) => e.fmt(f),
+        }
     }
 }
 
@@ -41,5 +47,39 @@ impl From<WindowBuildError> for CtraitError {
 impl From<String> for CtraitError {
     fn from(err: String) -> Self {
         Self::Other(err)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{CtraitError, IntegerOrSdlError, UpdateTextureError, WindowBuildError};
+
+    macro_rules! assert_error_display {
+        ($variant:ident, $error:expr) => {
+            format!("{}", CtraitError::$variant($error))
+        };
+        ($variant:ident, $error:expr, $expected:expr) => {
+            assert_eq!(assert_error_display!($variant, $error), $expected);
+        };
+    }
+
+    #[test]
+    fn error_display_integer_or() {
+        assert_error_display!(IntegerOr, IntegerOrSdlError::IntegerOverflows("a", 1));
+    }
+
+    #[test]
+    fn error_display_update_texture() {
+        assert_error_display!(UpdateTexture, UpdateTextureError::PitchOverflows(1));
+    }
+
+    #[test]
+    fn error_display_window_build() {
+        assert_error_display!(WindowBuild, WindowBuildError::HeightOverflows(1));
+    }
+
+    #[test]
+    fn error_display_other() {
+        assert_error_display!(Other, String::from("error"), "error");
     }
 }
