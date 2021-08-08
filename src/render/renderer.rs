@@ -1,7 +1,7 @@
 use crate::{
     camera::Camera,
     game::{Entity, EntityContainer},
-    render::{RendererConfig, WindowCanvas},
+    render::{RendererConfig, TextureManager, WindowCanvas},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, EventPump};
@@ -9,6 +9,7 @@ use sdl2::{self, event::Event, pixels::Color, EventPump};
 /// Renders entities.
 pub struct Renderer {
     pub config: RendererConfig,
+    texture_paths: Vec<String>,
     quit: bool,
     camera: Option<Entity<Camera>>,
 }
@@ -43,9 +44,18 @@ impl Renderer {
     pub fn new(config: RendererConfig) -> Self {
         Self {
             config,
+            texture_paths: Vec::new(),
             quit: false,
             camera: None,
         }
+    }
+
+    pub fn with_texture_paths(mut self, textures: &[&str]) {
+        self.texture_paths = textures.iter().map(|s| s.to_string()).collect();
+    }
+
+    pub fn texture_paths(&mut self) -> &Vec<String> {
+        &self.texture_paths
     }
 
     /// Attach a camera to the renderer.
@@ -109,6 +119,7 @@ impl Renderer {
     pub(crate) fn render(
         &mut self,
         canvas: &mut WindowCanvas,
+        texture_manager: &mut TextureManager,
         entities: &mut EntityContainer<dyn Renderable>,
     ) {
         if let Some(camera) = &mut self.camera {
@@ -122,7 +133,7 @@ impl Renderer {
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .render(&camera, canvas);
+                    .render(&camera, canvas, texture_manager);
             }
             canvas.present();
         }

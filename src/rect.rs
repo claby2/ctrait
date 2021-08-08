@@ -1,4 +1,9 @@
-use crate::{camera::Camera, math::Vector2, render::WindowCanvas, traits::Renderable};
+use crate::{
+    camera::Camera,
+    math::Vector2,
+    render::{TextureManager, WindowCanvas},
+    traits::Renderable,
+};
 use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 
 /// A rectangle relative to world coordinates.
@@ -109,7 +114,7 @@ impl Rect {
 
 impl Renderable for Rect {
     #[track_caller]
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
+    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas, _: &mut TextureManager) {
         if let Some(color) = self.color {
             if let Some(canvas_rect) = self.to_canvas_rect(camera) {
                 canvas.set_draw_color(color);

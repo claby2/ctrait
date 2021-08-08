@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, EntityContainer, Game},
     math::Vector2,
     rect::Rect,
-    render::{Renderer, WindowCanvas},
+    render::{Renderer, TextureManager, WindowCanvas},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -31,8 +31,13 @@ impl FixedUpdate for Block {
 }
 
 impl Renderable for Block {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(
+        &self,
+        camera: &Camera,
+        canvas: &mut WindowCanvas,
+        texture_manager: &mut TextureManager,
+    ) {
+        self.rect.render(camera, canvas, texture_manager);
     }
 }
 
@@ -125,8 +130,13 @@ impl FixedUpdate for Spawner {
 }
 
 impl Renderable for Spawner {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(
+        &self,
+        camera: &Camera,
+        canvas: &mut WindowCanvas,
+        texture_manager: &mut TextureManager,
+    ) {
+        self.rect.render(camera, canvas, texture_manager);
     }
 }
 

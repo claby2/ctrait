@@ -1,6 +1,6 @@
 use crate::{
     error::CtraitResult,
-    render::Renderer,
+    render::{Renderer, TextureManager},
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
 use chrono::Duration;
@@ -67,17 +67,17 @@ macro_rules! entity_clone {
 ///     camera::Camera,
 ///     entity, entity_slice,
 ///     game::Game,
-///     render::WindowCanvas,
+///     render::{TextureManager, WindowCanvas},
 ///     traits::Renderable
 /// };
 ///
 /// struct A;
 /// impl Renderable for A {
-///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
+///     fn render(&self, _: &Camera, _: &mut WindowCanvas, _: &mut TextureManager) {}
 /// }
 /// struct B;
 /// impl Renderable for B {
-///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
+///     fn render(&self, _: &Camera, _: &mut WindowCanvas, _: &mut TextureManager) {}
 /// }
 ///
 /// let a = entity!(A {});
@@ -188,7 +188,27 @@ impl Game {
         let video_subsystem = sdl_context.video()?;
         let window = renderer.config.get_window(&video_subsystem)?;
         let mut canvas = window.into_canvas().build()?;
-        self.fixed_update();
+        let texture_creator = canvas.texture_creator();
+        let mut texture_manager = TextureManager::new(&texture_creator);
+        // Start fixed update processs.
+        let timer = Timer::new();
+        let mut fixed_update_instant = Instant::now();
+        let fixed_update_entities = Arc::clone(&self.fixed_update_entities.0);
+        let _guard = timer.schedule_repeating(Duration::milliseconds(self.timestep), move || {
+            let mut fixed_update_entities = fixed_update_entities.lock().unwrap();
+            // Since fixed_update_entities is an Arc clone, EntityContainer::access cannot be used.
+            // Use EntityContainer::prune instead.
+            EntityContainer::prune(&mut fixed_update_entities);
+            fixed_update_entities.iter().for_each(|entity| {
+                entity
+                    .upgrade()
+                    .unwrap()
+                    .lock()
+                    .unwrap()
+                    .fixed_update(fixed_update_instant.elapsed().as_secs_f64())
+            });
+            fixed_update_instant = Instant::now();
+        });
         // Start standard game loop.
         let mut standard_instant = Instant::now();
         loop {
@@ -210,31 +230,13 @@ impl Game {
             if renderer.has_quit() {
                 break;
             }
-            renderer.render(&mut canvas, &mut self.renderable_entities);
+            renderer.render(
+                &mut canvas,
+                &mut texture_manager,
+                &mut self.renderable_entities,
+            );
         }
         Ok(())
-    }
-
-    fn fixed_update(&mut self) {
-        // Start fixed update processs.
-        let timer = Timer::new();
-        let mut fixed_update_instant = Instant::now();
-        let fixed_update_entities = Arc::clone(&self.fixed_update_entities.0);
-        let _guard = timer.schedule_repeating(Duration::milliseconds(self.timestep), move || {
-            let mut fixed_update_entities = fixed_update_entities.lock().unwrap();
-            // Since fixed_update_entities is an Arc clone, EntityContainer::access cannot be used.
-            // Use EntityContainer::prune instead.
-            EntityContainer::prune(&mut fixed_update_entities);
-            fixed_update_entities.iter().for_each(|entity| {
-                entity
-                    .upgrade()
-                    .unwrap()
-                    .lock()
-                    .unwrap()
-                    .fixed_update(fixed_update_instant.elapsed().as_secs_f64())
-            });
-            fixed_update_instant = Instant::now();
-        });
     }
 }
 
