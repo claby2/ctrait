@@ -89,7 +89,7 @@ impl Rect {
 
     // Get the equivalent CanvasRect relative to camera.
     // Will return None if the CanvasRect is outside of the camera's view.
-    fn to_canvas_rect(&self, camera: &Camera) -> Option<CanvasRect> {
+    pub(crate) fn to_canvas_rect(&self, camera: &Camera) -> Option<CanvasRect> {
         let mut canvas_rect: CanvasRect = self.clone().into();
         let new_position = camera.get_canvas_position(self.position);
         canvas_rect.x = new_position.x;
