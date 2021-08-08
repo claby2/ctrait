@@ -14,7 +14,7 @@ pub trait Update: Send {
 pub trait FixedUpdate: Send {
     /// `delta` is the number of seconds since the last update.
     /// It should be approximately equal to the default timestep
-    /// [`crate::game::Game::DEFAULT_TIMESTEP`].
+    /// [`Game::DEFAULT_TIMESTEP`](crate::game::Game::DEFAULT_TIMESTEP).
     fn fixed_update(&mut self, delta: f64);
 }
 
@@ -26,6 +26,6 @@ pub trait Interactive: Send {
 
 /// A type that can be rendered.
 pub trait Renderable: Send {
-    /// Called by [`crate::render::Renderer`].
+    /// Called by [`Renderer`](crate::render::Renderer).
     fn render(&self, camera: &Camera, layer: &mut RenderLayer);
 }

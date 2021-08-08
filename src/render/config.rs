@@ -1,7 +1,7 @@
 use crate::error::CtraitResult;
 use sdl2::{video::Window, VideoSubsystem};
 
-/// Configuration for [`crate::render::Renderer`].
+/// Configuration for [`Renderer`](crate::render::Renderer).
 #[derive(Debug)]
 pub struct RendererConfig {
     pub dimensions: Option<(u32, u32)>,
