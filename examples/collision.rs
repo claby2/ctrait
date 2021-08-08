@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{Renderer, WindowCanvas},
+    render::{RenderLayer, Renderer},
     traits::{Interactive, Renderable, Update},
     Color, Event,
 };
@@ -53,8 +53,8 @@ impl Update for Cursor {
 }
 
 impl Renderable for Cursor {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
@@ -87,14 +87,14 @@ impl Update for Detector {
 }
 
 impl Renderable for Detector {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
 fn main() {
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::new(None).unwrap().with_camera_entity(&camera);
+    let mut renderer = Renderer::default().with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
     let detector = entity!(Detector::new(entity_clone!(cursor)));
     let mut game = Game::default();
@@ -104,5 +104,5 @@ fn main() {
         .push(&entity_clone!(Interactive, cursor));
     game.renderable_entities
         .extend_from_slice(&entity_slice!(Renderable, detector, cursor));
-    game.start(&mut renderer);
+    game.start(&mut renderer).unwrap();
 }

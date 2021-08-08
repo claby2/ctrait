@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{Renderer, WindowCanvas},
+    render::{RenderLayer, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -76,8 +76,8 @@ impl Interactive for Paddle {
 }
 
 impl Renderable for Paddle {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
@@ -149,15 +149,15 @@ impl FixedUpdate for Ball {
 }
 
 impl Renderable for Ball {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
 fn main() {
     // Define the camera as an entity so it can be referred to by Ball.
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::new(None).unwrap().with_camera_entity(&camera);
+    let mut renderer = Renderer::default().with_camera_entity(&camera);
     let paddle1 = entity!(Paddle::new(-400, Keycode::W, Keycode::S));
     let paddle2 = entity!(Paddle::new(400, Keycode::Up, Keycode::Down));
     let ball = entity!(Ball::new(
@@ -177,5 +177,5 @@ fn main() {
         .extend_from_slice(&entity_slice!(Renderable, paddle1, paddle2, ball));
     game.interactive_entities
         .extend_from_slice(&entity_slice!(Interactive, paddle1, paddle2));
-    game.start(&mut renderer);
+    game.start(&mut renderer).unwrap();
 }

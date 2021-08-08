@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, EntityContainer, Game},
     math::Vector2,
     rect::Rect,
-    renderer::{Renderer, WindowCanvas},
+    render::{RenderLayer, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -31,8 +31,8 @@ impl FixedUpdate for Block {
 }
 
 impl Renderable for Block {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
@@ -125,14 +125,14 @@ impl FixedUpdate for Spawner {
 }
 
 impl Renderable for Spawner {
-    fn render(&self, camera: &Camera, canvas: &mut WindowCanvas) {
-        self.rect.render(camera, canvas);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
 fn main() {
     let mut game = Game::default();
-    let mut renderer = Renderer::new(None).unwrap().with_camera(Camera::default());
+    let mut renderer = Renderer::default().with_camera(Camera::default());
     let spawner = entity!(Spawner::new(
         &game.renderable_entities,
         &game.fixed_update_entities
@@ -146,5 +146,5 @@ fn main() {
         .push(&entity_clone!(FixedUpdate, spawner));
     game.renderable_entities
         .push(&entity_clone!(Renderable, spawner));
-    game.start(&mut renderer);
+    game.start(&mut renderer).unwrap();
 }

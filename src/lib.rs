@@ -2,7 +2,8 @@ pub mod camera;
 pub mod error;
 pub mod game;
 pub mod rect;
-pub mod renderer;
+pub mod render;
+pub mod sprite;
 pub mod traits;
 
 // Re-export.

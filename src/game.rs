@@ -1,5 +1,6 @@
 use crate::{
-    renderer::Renderer,
+    error::CtraitResult,
+    render::{manager::TextureManager, RenderLayer, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
 use chrono::Duration;
@@ -66,17 +67,17 @@ macro_rules! entity_clone {
 ///     camera::Camera,
 ///     entity, entity_slice,
 ///     game::Game,
-///     renderer::WindowCanvas,
+///     render::RenderLayer,
 ///     traits::Renderable
 /// };
 ///
 /// struct A;
 /// impl Renderable for A {
-///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
+///     fn render(&self, _: &Camera, _: &mut RenderLayer) {}
 /// }
 /// struct B;
 /// impl Renderable for B {
-///     fn render(&self, _: &Camera, _: &mut WindowCanvas) {}
+///     fn render(&self, _: &Camera, _: &mut RenderLayer) {}
 /// }
 ///
 /// let a = entity!(A {});
@@ -181,7 +182,15 @@ impl Game {
 
     /// Start the game with the given renderer.
     /// This will consume the game and block until a quit signal has been sent.
-    pub fn start(&mut self, renderer: &mut Renderer) {
+    pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
+        let sdl_context = sdl2::init()?;
+        let mut event_pump = sdl_context.event_pump()?;
+        let video_subsystem = sdl_context.video()?;
+        let window = renderer.config.get_window(&video_subsystem)?;
+        let canvas = window.into_canvas().build()?;
+        let texture_creator = canvas.texture_creator();
+        let texture_manager = TextureManager::new(&texture_creator);
+        let mut render_layer = RenderLayer::new(canvas, texture_manager);
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
@@ -204,7 +213,7 @@ impl Game {
         // Start standard game loop.
         let mut standard_instant = Instant::now();
         loop {
-            renderer.process_event(&mut self.interactive_entities);
+            renderer.process_event(&mut event_pump, &mut self.interactive_entities);
             self.update_entities
                 .access()
                 .lock()
@@ -222,8 +231,9 @@ impl Game {
             if renderer.has_quit() {
                 break;
             }
-            renderer.render(&mut self.renderable_entities);
+            renderer.render(&mut render_layer, &mut self.renderable_entities);
         }
+        Ok(())
     }
 }
 
