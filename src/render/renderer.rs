@@ -1,7 +1,7 @@
 use crate::{
     camera::Camera,
     game::{Entity, EntityContainer},
-    render::{RenderLayer, RendererConfig},
+    render::{RenderContext, RendererConfig},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, EventPump};
@@ -109,23 +109,23 @@ impl Renderer {
     // Render a vector of Rederable objects to canvas.
     pub(crate) fn render(
         &mut self,
-        layer: &mut RenderLayer,
+        context: &mut RenderContext,
         entities: &mut EntityContainer<dyn Renderable>,
     ) {
         if let Some(camera) = &mut self.camera {
             let mut camera = camera.lock().unwrap();
-            camera.update(&layer.canvas);
-            layer.canvas.set_draw_color(Color::BLACK);
-            layer.canvas.clear();
+            camera.update(&context.canvas);
+            context.canvas.set_draw_color(Color::BLACK);
+            context.canvas.clear();
             for entity in entities.access().lock().unwrap().iter() {
                 entity
                     .upgrade()
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .render(&camera, layer);
+                    .render(&camera, context);
             }
-            layer.canvas.present();
+            context.canvas.present();
         }
     }
 }

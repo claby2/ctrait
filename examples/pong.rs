@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    render::{RenderLayer, Renderer},
+    render::{RenderContext, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };
@@ -76,8 +76,8 @@ impl Interactive for Paddle {
 }
 
 impl Renderable for Paddle {
-    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
-        self.rect.render(camera, layer);
+    fn render(&self, camera: &Camera, context: &mut RenderContext) {
+        self.rect.render(camera, context);
     }
 }
 
@@ -149,8 +149,8 @@ impl FixedUpdate for Ball {
 }
 
 impl Renderable for Ball {
-    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
-        self.rect.render(camera, layer);
+    fn render(&self, camera: &Camera, context: &mut RenderContext) {
+        self.rect.render(camera, context);
     }
 }
 

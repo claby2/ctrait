@@ -3,7 +3,7 @@ use ctrait::{
     entity, entity_clone,
     game::Game,
     rect::Rect,
-    render::{RenderLayer, Renderer},
+    render::{RenderContext, Renderer},
     sprite::Sprite,
     traits::Renderable,
 };
@@ -28,8 +28,8 @@ impl Image {
 }
 
 impl Renderable for Image {
-    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
-        self.sprite.render(camera, layer);
+    fn render(&self, camera: &Camera, context: &mut RenderContext) {
+        self.sprite.render(camera, context);
     }
 }
 

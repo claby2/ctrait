@@ -1,4 +1,4 @@
-use crate::{camera::Camera, rect::Rect, render::RenderLayer, traits::Renderable};
+use crate::{camera::Camera, rect::Rect, render::RenderContext, traits::Renderable};
 
 /// A sprite which holds a path to a texture and a [`Rect`].
 #[derive(Debug)]
@@ -27,10 +27,10 @@ impl Sprite {
 }
 
 impl Renderable for Sprite {
-    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+    fn render(&self, camera: &Camera, context: &mut RenderContext) {
         if let Some(canvas_rect) = self.rect.to_canvas_rect(camera) {
-            let texture = layer.texture_manager.load(&self.path).unwrap();
-            layer.canvas.copy(&texture, None, canvas_rect).unwrap();
+            let texture = context.texture_manager.load(&self.path).unwrap();
+            context.canvas.copy(&texture, None, canvas_rect).unwrap();
         }
     }
 }

@@ -1,8 +1,8 @@
 mod config;
-mod layer;
+mod context;
 pub(crate) mod manager;
 mod renderer;
 
 pub use config::RendererConfig;
-pub use layer::RenderLayer;
+pub use context::RenderContext;
 pub use renderer::Renderer;

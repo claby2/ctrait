@@ -1,6 +1,6 @@
 use crate::{
     error::CtraitResult,
-    render::{manager::TextureManager, RenderLayer, Renderer},
+    render::{manager::TextureManager, RenderContext, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
 use chrono::Duration;
@@ -67,17 +67,17 @@ macro_rules! entity_clone {
 ///     camera::Camera,
 ///     entity, entity_slice,
 ///     game::Game,
-///     render::RenderLayer,
+///     render::RenderContext,
 ///     traits::Renderable
 /// };
 ///
 /// struct A;
 /// impl Renderable for A {
-///     fn render(&self, _: &Camera, _: &mut RenderLayer) {}
+///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
 /// }
 /// struct B;
 /// impl Renderable for B {
-///     fn render(&self, _: &Camera, _: &mut RenderLayer) {}
+///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
 /// }
 ///
 /// let a = entity!(A {});
@@ -190,7 +190,7 @@ impl Game {
         let canvas = window.into_canvas().build()?;
         let texture_creator = canvas.texture_creator();
         let texture_manager = TextureManager::new(&texture_creator);
-        let mut render_layer = RenderLayer::new(canvas, texture_manager);
+        let mut render_context = RenderContext::new(canvas, texture_manager);
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
@@ -231,7 +231,7 @@ impl Game {
             if renderer.has_quit() {
                 break;
             }
-            renderer.render(&mut render_layer, &mut self.renderable_entities);
+            renderer.render(&mut render_context, &mut self.renderable_entities);
         }
         Ok(())
     }
