@@ -81,3 +81,32 @@ impl Default for RendererConfig {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::RendererConfig;
+
+    #[test]
+    fn renderer_config_set_dimensions() {
+        let config = RendererConfig {
+            dimensions: Some((5, 10)),
+            ..Default::default()
+        };
+        assert_eq!(config.dimensions(), (5, 10));
+    }
+
+    #[test]
+    fn renderer_config_fallback_dimensions() {
+        let config = RendererConfig {
+            dimensions: None,
+            ..Default::default()
+        };
+        assert_eq!(
+            config.dimensions(),
+            (
+                RendererConfig::FALLBACK_WIDTH,
+                RendererConfig::FALLBACK_HEIGHT
+            )
+        );
+    }
+}
