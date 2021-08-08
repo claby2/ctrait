@@ -1,12 +1,13 @@
 use crate::{
     camera::Camera,
     game::{Entity, EntityContainer},
-    render::{RendererConfig, TextureManager, WindowCanvas},
+    render::{RenderLayer, RendererConfig},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, EventPump};
 
 /// Renders entities.
+#[derive(Debug)]
 pub struct Renderer {
     pub config: RendererConfig,
     texture_paths: Vec<String>,
@@ -118,24 +119,23 @@ impl Renderer {
     // Render a vector of Rederable objects to canvas.
     pub(crate) fn render(
         &mut self,
-        canvas: &mut WindowCanvas,
-        texture_manager: &mut TextureManager,
+        layer: &mut RenderLayer,
         entities: &mut EntityContainer<dyn Renderable>,
     ) {
         if let Some(camera) = &mut self.camera {
             let mut camera = camera.lock().unwrap();
-            camera.update(canvas);
-            canvas.set_draw_color(Color::BLACK);
-            canvas.clear();
+            camera.update(&layer.canvas);
+            layer.canvas.set_draw_color(Color::BLACK);
+            layer.canvas.clear();
             for entity in entities.access().lock().unwrap().iter() {
                 entity
                     .upgrade()
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .render(&camera, canvas, texture_manager);
+                    .render(&camera, layer);
             }
-            canvas.present();
+            layer.canvas.present();
         }
     }
 }

@@ -1,8 +1,8 @@
 mod config;
-mod manager;
+mod layer;
+pub(crate) mod manager;
 mod renderer;
 
 pub use config::RendererConfig;
-pub use manager::TextureManager;
+pub use layer::RenderLayer;
 pub use renderer::Renderer;
-pub use sdl2::render::WindowCanvas;

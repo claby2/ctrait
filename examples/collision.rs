@@ -4,7 +4,7 @@ use ctrait::{
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
-    render::{Renderer, TextureManager, WindowCanvas},
+    render::{RenderLayer, Renderer},
     traits::{Interactive, Renderable, Update},
     Color, Event,
 };
@@ -53,13 +53,8 @@ impl Update for Cursor {
 }
 
 impl Renderable for Cursor {
-    fn render(
-        &self,
-        camera: &Camera,
-        canvas: &mut WindowCanvas,
-        texture_manager: &mut TextureManager,
-    ) {
-        self.rect.render(camera, canvas, texture_manager);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 
@@ -92,13 +87,8 @@ impl Update for Detector {
 }
 
 impl Renderable for Detector {
-    fn render(
-        &self,
-        camera: &Camera,
-        canvas: &mut WindowCanvas,
-        texture_manager: &mut TextureManager,
-    ) {
-        self.rect.render(camera, canvas, texture_manager);
+    fn render(&self, camera: &Camera, layer: &mut RenderLayer) {
+        self.rect.render(camera, layer);
     }
 }
 

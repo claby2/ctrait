@@ -2,7 +2,7 @@ use ctrait::{
     camera::Camera,
     entity, entity_clone,
     game::Game,
-    render::{Renderer, TextureManager, WindowCanvas},
+    render::{RenderLayer, Renderer},
     traits::Renderable,
 };
 use std::env;
@@ -21,9 +21,9 @@ impl Image {
 }
 
 impl Renderable for Image {
-    fn render(&self, _: &Camera, canvas: &mut WindowCanvas, texture_manager: &mut TextureManager) {
-        let texture = texture_manager.load(&self.path).unwrap();
-        canvas.copy(&texture, None, None).unwrap();
+    fn render(&self, _: &Camera, layer: &mut RenderLayer) {
+        let texture = layer.texture_manager.load(&self.path).unwrap();
+        layer.canvas.copy(&texture, None, None).unwrap();
     }
 }
 
