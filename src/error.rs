@@ -1,9 +1,14 @@
+//! Internal errors.
+
 use sdl2::{render::UpdateTextureError, video::WindowBuildError, IntegerOrSdlError};
 use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 
+/// Type alias for a [`Result`] with [`CtraitError`] error type.
 pub type CtraitResult<T> = Result<T, CtraitError>;
 
+/// Enum representing potential error types.
+#[allow(missing_docs)]
 #[derive(Debug)]
 pub enum CtraitError {
     IntegerOr(IntegerOrSdlError),

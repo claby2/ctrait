@@ -1,3 +1,5 @@
+//! Render functionality.
+
 mod config;
 mod context;
 pub(crate) mod manager;

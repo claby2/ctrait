@@ -9,6 +9,7 @@ use sdl2::{self, event::Event, pixels::Color, EventPump};
 /// Renders entities.
 #[derive(Debug)]
 pub struct Renderer {
+    /// The renderer's current configuration.
     pub config: RendererConfig,
     quit: bool,
     camera: Option<Entity<Camera>>,

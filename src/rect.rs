@@ -1,3 +1,5 @@
+//! Rectangle.
+
 use crate::{camera::Camera, math::Vector2, render::RenderContext, traits::Renderable};
 use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 
@@ -6,7 +8,9 @@ use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 pub struct Rect {
     /// Position of top-left corner.
     pub position: Vector2<i32>,
+    /// Width and height of rectangle.
     pub size: Vector2<u32>,
+    /// Color of the rectangle. This must  be [`Some`] for the rectangle to be rendered.
     pub color: Option<Color>,
 }
 
@@ -21,7 +25,18 @@ impl Default for Rect {
 }
 
 impl Rect {
-    /// Construct a new rectangle.
+    /// Constructs a new rectangle.
+    ///
+    /// `x` and `y` represent the top-left corner of the rectangle.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{math::Vector2, rect::Rect};
+    ///
+    /// let rect = Rect::new(-5, -5, 10, 10);
+    /// // rect now represents a rectangle centered at (0, 0).
+    /// assert_eq!(rect.center(), Vector2::new(0, 0));
+    /// ```
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
         Self {
             position: Vector2::new(x, y),
@@ -30,7 +45,16 @@ impl Rect {
         }
     }
 
-    /// Construct a new rectangle with the given x and y coordinates as the rectangle's center position.
+    /// Constructs a new rectangle with the given x and y coordinates as the rectangle's center position.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{math::Vector2, rect::Rect};
+    ///
+    /// let rect = Rect::from_center(0, 0, 10, 10);
+    /// // rect now represents a rectangle centered at (0, 0).
+    /// assert_eq!(rect.center(), Vector2::new(0, 0));
+    /// ```
     pub fn from_center(center_x: i32, center_y: i32, width: u32, height: u32) -> Self {
         Self::new(
             center_x - (width / 2) as i32,
@@ -40,18 +64,44 @@ impl Rect {
         )
     }
 
-    // Set the render color.
+    /// Construct rectangle with given color.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{rect::Rect, Color};
+    ///
+    /// let rect = Rect::default().with_color(&Color::GRAY);
+    /// assert_eq!(rect.color, Some(Color::GRAY));
+    /// ```
     pub fn with_color(mut self, color: &Color) -> Self {
         self.color = Some(*color);
         self
     }
 
-    /// Return the center position as a [`Vector2`].
+    /// Returns the center position as a [`Vector2`].
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{math::Vector2, rect::Rect};
+    ///
+    /// let rect = Rect::from_center(1, 2, 3, 4);
+    /// assert_eq!(rect.center(), Vector2::new(1, 2));
+    /// ```
     pub fn center(&self) -> Vector2<i32> {
         self.position + Vector2::cast(&(self.size / 2)).unwrap()
     }
 
-    // Centers the rectangle on the given x and y coordinates.
+    /// Centers the rectangle on the given x and y coordinates.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{math::Vector2, rect::Rect};
+    ///
+    /// let mut rect = Rect::from_center(0, 0, 10, 10);
+    /// // Set the rectangle's center point to (4, 5).
+    /// rect.center_on(4, 5);
+    /// assert_eq!(rect.center(), Vector2::new(4, 5));
+    /// ```
     pub fn center_on(&mut self, center_x: i32, center_y: i32) {
         self.position = Vector2::new(
             center_x - (self.size.x / 2) as i32,
@@ -87,7 +137,7 @@ impl Rect {
             && self.position.y + self.size.y as i32 > other.position.y
     }
 
-    // Get the equivalent CanvasRect relative to camera.
+    // Retrieves the equivalent CanvasRect relative to camera.
     // Will return None if the CanvasRect is outside of the camera's view.
     pub(crate) fn to_canvas_rect(&self, camera: &Camera) -> Option<CanvasRect> {
         let mut canvas_rect: CanvasRect = self.clone().into();

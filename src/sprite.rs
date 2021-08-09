@@ -1,16 +1,20 @@
+//! Sprite used to display textures.
+
 use crate::{camera::Camera, rect::Rect, render::RenderContext, traits::Renderable};
 
 /// A sprite which holds a path to a texture and a [`Rect`].
 #[derive(Debug)]
 pub struct Sprite {
+    /// Path to the texture.
     pub path: String,
+    /// Rectangle representing the sprite's position and size.
     pub rect: Rect,
 }
 
 impl Sprite {
-    /// Construct a new sprite.
+    /// Constructs a new sprite.
     ///
-    /// On render, the given texture path will be rendered onto the given [`Rect`].
+    /// When rendered, the given texture path will be rendered onto the given [`Rect`].
     ///
     /// # Example
     /// ```

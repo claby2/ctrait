@@ -1,3 +1,5 @@
+//! Main storage for entity containers.
+
 use crate::{
     error::CtraitResult,
     render::{manager::TextureManager, RenderContext, Renderer},
@@ -13,7 +15,7 @@ use timer::Timer;
 /// A type representing a single game entity.
 pub type Entity<T> = Arc<Mutex<T>>;
 
-pub(crate) type WeakEntity<T> = Weak<Mutex<T>>;
+type WeakEntity<T> = Weak<Mutex<T>>;
 
 /// Macro to quickly create a new entity.
 ///
@@ -37,14 +39,23 @@ macro_rules! entity {
 ///
 /// This does not clone the entity's inner type, rather it creates another pointer to it.
 ///
+/// Optionally, an additional trait can be passed to coerce the cloned entity to a specific trait
+/// object.
+///
 /// # Example
 /// ```
-/// use ctrait::{entity, entity_clone};
+/// use ctrait::{game::Entity, entity, entity_clone, traits::Update};
 ///
-/// struct Player;
+/// struct Foo;
 ///
-/// let player = entity!(Player {});
-/// let player_clone = entity_clone!(player);
+/// impl Update for Foo {
+///     fn update(&mut self, _: f64) {}
+/// }
+///
+/// let foo = entity!(Foo {});
+/// let foo_clone: Entity<Foo> = entity_clone!(foo);
+/// // Coerce foo into a specific trait object.
+/// let foo_update_clone: Entity<dyn Update> = entity_clone!(Update, foo);
 /// ```
 #[macro_export]
 macro_rules! entity_clone {
@@ -148,9 +159,13 @@ impl<T: ?Sized> EntityContainer<T> {
 /// The game manager holds multiple [`EntityContainer`]s, each representing [`Weak`] pointers to
 /// entities.
 pub struct Game {
+    /// Entities implementing [`Update`] trait.
     pub update_entities: EntityContainer<dyn Update>,
+    /// Entities implementing [`FixedUpdate`] trait.
     pub fixed_update_entities: EntityContainer<dyn FixedUpdate>,
+    /// Entities implementing [`Renderable`] trait.
     pub renderable_entities: EntityContainer<dyn Renderable>,
+    /// Entities implementing [`Interactive`] trait.
     pub interactive_entities: EntityContainer<dyn Interactive>,
     timestep: i64,
 }
@@ -181,7 +196,8 @@ impl Game {
     }
 
     /// Start the game with the given renderer.
-    /// This will consume the game and block until a quit signal has been sent.
+    ///
+    /// This will block until a quit signal is sent.
     pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;

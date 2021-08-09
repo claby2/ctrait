@@ -1,9 +1,12 @@
+//! Camera used to convert between world and canvas positions.
+
 use crate::math::Vector2;
 use sdl2::render::WindowCanvas;
 
-/// Camera that displays the entities rendered to the canvas.
+/// Camera with a position used to calculate relative world and canvas positions.
 #[derive(Debug)]
 pub struct Camera {
+    /// World position of the camera.
     pub position: Vector2<i32>,
     pub(crate) canvas_size: Vector2<u32>,
 }
@@ -18,8 +21,9 @@ impl Default for Camera {
 }
 
 impl Camera {
-    /// Retrieve the size of the canvas.
-    /// The value is updated once per game loop iteration.
+    /// Retrieves the size of the canvas.
+    ///
+    /// The value is internally updated once per game loop iteration.
     ///
     /// # Example
     /// ```
@@ -33,12 +37,12 @@ impl Camera {
         &self.canvas_size
     }
 
-    /// Convert the given canvas position to its equivalent world position.
+    /// Converts the given canvas position to its equivalent world position.
     pub fn get_world_position(&self, canvas_position: Vector2<i32>) -> Vector2<i32> {
         canvas_position + self.position - Vector2::cast(&(self.canvas_size / 2)).unwrap()
     }
 
-    /// Convert the given world position to its equivalent canvas position.
+    /// Converts the given world position to its equivalent canvas position.
     pub fn get_canvas_position(&self, world_position: Vector2<i32>) -> Vector2<i32> {
         world_position - self.position + Vector2::cast(&(self.canvas_size / 2)).unwrap()
     }

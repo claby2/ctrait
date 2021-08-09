@@ -4,27 +4,45 @@ use sdl2::{video::Window, VideoSubsystem};
 /// Configuration for [`Renderer`](crate::render::Renderer).
 #[derive(Debug)]
 pub struct RendererConfig {
+    /// Dimensions of the window.
+    ///
+    /// If this is [`None`], a [`FALLBACK_WIDTH`](Self::FALLBACK_WIDTH) and
+    /// [`FALLBACK_HEIGHT`](Self::FALLBACK_HEIGHT) will be used.
     pub dimensions: Option<(u32, u32)>,
+    /// Title of the window.
     pub title: String,
+    /// Position of the window.
     pub position: Option<(i32, i32)>,
+    /// Set the window to start in fullscreen mode.
     pub fullscreen: bool,
+    /// Allow the window to be usable with OpenGL context.
     pub opengl: bool,
+    /// Set window to borderless.
     pub borderless: bool,
+    /// Allow the window to be resized.
     pub resizable: bool,
+    /// Start the window as minimized.
     pub minimized: bool,
+    /// Start the window as maximized.
     pub maximized: bool,
+    /// Set the window to have grabbed input focus.
     pub input_grabbed: bool,
+    /// Set the window to fullscreen at the current desktop resolution.
     pub fullscreen_desktop: bool,
+    /// Creates the window in high-DPI mode.
     pub allow_highdpi: bool,
+    /// Allow the window to be usable with Vulkan instance.
     pub vulkan: bool,
 }
 
 impl RendererConfig {
+    /// Default window width.
     pub const FALLBACK_WIDTH: u32 = 640;
+    /// Default window height.
     pub const FALLBACK_HEIGHT: u32 = 480;
 
     /// Get the dimensions specified in the configuration. If dimensions is [`None`], returns
-    /// fallback dimensions derived from [`Self::FALLBACK_WIDTH`] and [`Self::FALLBACK_HEIGHT`].
+    /// fallback dimensions derived from [`FALLBACK_WIDTH`](Self::FALLBACK_WIDTH) and [`FALLBACK_HEIGHT`](Self::FALLBACK_HEIGHT).
     pub fn dimensions(&self) -> (u32, u32) {
         if let Some(dimensions) = self.dimensions {
             dimensions

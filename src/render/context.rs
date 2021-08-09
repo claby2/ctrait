@@ -5,7 +5,9 @@ use sdl2::render::WindowCanvas;
 ///
 /// This is used as an argument to the [`Renderable`](crate::traits::Renderable) trait.
 pub struct RenderContext<'a> {
+    /// Canvas used for rendering.
     pub canvas: WindowCanvas,
+    /// Manager to organize and delegate the game's textures.
     pub texture_manager: TextureManager<'a>,
 }
 
