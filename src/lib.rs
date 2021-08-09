@@ -9,7 +9,7 @@
 //! ```no_run
 //! use ctrait::{
 //!     camera::Camera,
-//!     entity, entity_clone,
+//!     entity, entities,
 //!     game::Game,
 //!     rect::Rect,
 //!     render::{RenderContext, Renderer},
@@ -25,13 +25,16 @@
 //! impl Player {
 //!     fn new() -> Self {
 //!         Self {
+//!             // Create a red rectangle with a width and height of 50 pixels.
 //!             rect: Rect::from_center(0, 0, 50, 50).with_color(&Color::RED),
 //!         }
 //!     }
 //! }
 //!
+//! // Allow the player to be rendered.
 //! impl Renderable for Player {
 //!     fn render(&self, camera: &Camera, context: &mut RenderContext) {
+//!         // Since Rect implements Renderable, it can be rendered with a single function call.
 //!         self.rect.render(camera, context);
 //!     }
 //! }
@@ -41,8 +44,9 @@
 //! let player = entity!(Player::new());
 //!
 //! let mut game = Game::default();
+//! // Register the player entity as a Renderable entity.
 //! game.renderable_entities
-//!     .push(&entity_clone!(Renderable, player));
+//!     .add_entities(&entities!(Renderable; player));
 //! game.start(&mut renderer).unwrap();
 //! ```
 

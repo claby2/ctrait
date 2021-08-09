@@ -1,6 +1,6 @@
 use ctrait::{
     camera::Camera,
-    entity, entity_clone,
+    entities, entity,
     game::Game,
     rect::Rect,
     render::{RenderContext, Renderer},
@@ -43,7 +43,7 @@ fn main() {
         let mut renderer = Renderer::default().with_camera(Camera::default());
         let image = entity!(Image::new(path));
         game.renderable_entities
-            .push(&entity_clone!(Renderable, image));
+            .add_entities(&entities!(Renderable; image));
         game.start(&mut renderer).unwrap();
     }
 }

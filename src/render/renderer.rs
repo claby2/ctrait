@@ -61,7 +61,7 @@ impl Renderer {
     ///     .with_camera(Camera::default());
     /// ```
     pub fn with_camera(mut self, camera: Camera) -> Self {
-        self.camera = Some(crate::entity_clone!(&crate::entity!(camera)));
+        self.camera = Some(crate::entity!(camera));
         self
     }
 
@@ -78,7 +78,7 @@ impl Renderer {
     ///     .with_camera_entity(&camera);
     /// ```
     pub fn with_camera_entity(mut self, camera: &Entity<Camera>) -> Self {
-        self.camera = Some(crate::entity_clone!(&camera));
+        self.camera = Some(camera.clone());
         self
     }
 

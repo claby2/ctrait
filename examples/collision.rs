@@ -1,6 +1,6 @@
 use ctrait::{
     camera::Camera,
-    entity, entity_clone, entity_slice,
+    entities, entity,
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
@@ -30,7 +30,7 @@ impl Cursor {
 impl Interactive for Cursor {
     fn on_event(&mut self, event: &Event) {
         if let Event::MouseMotion { x, y, .. } = event {
-            // Get cursor position relative to canvas
+            // Get cursor position relative to canvas.
             self.cursor_position = Vector2::new(*x, *y);
         }
     }
@@ -45,6 +45,7 @@ impl Update for Cursor {
             .lock()
             .unwrap()
             .get_world_position(self.cursor_position);
+        // Set the rect's position to the cursor's world position.
         self.rect.position = Vector2::new(
             cursor_world_position.x - (Self::SIZE / 2) as i32,
             cursor_world_position.y - (Self::SIZE / 2) as i32,
@@ -66,11 +67,11 @@ struct Detector {
 }
 
 impl Detector {
-    fn new(cursor: Entity<Cursor>) -> Self {
+    fn new(cursor: &Entity<Cursor>) -> Self {
         Self {
             rect: Rect::from_center(0, 0, 300, 300),
             colliding: false,
-            cursor,
+            cursor: cursor.clone(),
         }
     }
 }
@@ -78,6 +79,7 @@ impl Detector {
 impl Update for Detector {
     fn update(&mut self, _: f64) {
         self.colliding = self.cursor.lock().unwrap().rect.intersects(&self.rect);
+        // Change the color of the rectangle depending on if it is colliding or not.
         self.rect.color = Some(if self.colliding {
             Color::GREEN
         } else {
@@ -93,16 +95,19 @@ impl Renderable for Detector {
 }
 
 fn main() {
+    // Camera is constructed as an entity so it can be referred to by other structs.
     let camera = entity!(Camera::default());
     let mut renderer = Renderer::default().with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
-    let detector = entity!(Detector::new(entity_clone!(cursor)));
+    let detector = entity!(Detector::new(&cursor));
     let mut game = Game::default();
     game.update_entities
-        .extend_from_slice(&entity_slice!(Update, cursor, detector));
+        .add_entities(&entities!(Update; cursor, detector));
     game.interactive_entities
-        .push(&entity_clone!(Interactive, cursor));
+        .add_entities(&entities!(Interactive; cursor));
+    // The detector is defined prior to cursor. This means the cursor is rendered on top of the
+    // detector.
     game.renderable_entities
-        .extend_from_slice(&entity_slice!(Renderable, detector, cursor));
+        .add_entities(&entities!(Renderable; detector, cursor));
     game.start(&mut renderer).unwrap();
 }

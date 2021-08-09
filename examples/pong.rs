@@ -1,6 +1,6 @@
 use ctrait::{
     camera::Camera,
-    entity, entity_clone, entity_slice,
+    entities, entity,
     game::{Entity, Game},
     math::Vector2,
     rect::Rect,
@@ -92,16 +92,17 @@ struct Ball {
 
 impl Ball {
     const SPEED: f64 = 800.0;
-    fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
+    fn new(camera: Entity<Camera>, paddle1: &Entity<Paddle>, paddle2: &Entity<Paddle>) -> Self {
         Self {
             rect: Rect::from_center(0, 0, 10, 10).with_color(&Color::WHITE),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
-            paddle1,
-            paddle2,
+            paddle1: paddle1.clone(),
+            paddle2: paddle2.clone(),
         }
     }
 
+    // Calculates the y velocity depending on the paddle's movement.
     fn calculate_y_velocity(paddle_movement: &Movement) -> f64 {
         if paddle_movement.up {
             -Self::SPEED
@@ -115,20 +116,23 @@ impl Ball {
 
 impl Update for Ball {
     fn update(&mut self, _: f64) {
+        // Here, Update is implemented for Ball to check for collisions. Update is used rather than
+        // FixedUpdate because none of the following code is time-dependent.
         let camera = self.camera.lock().unwrap();
         let canvas_position = camera.get_canvas_position(self.rect.position);
-        // Check if the Ball's x position is outside of the canvas.
         if canvas_position.x < 0
             || canvas_position.x as u32 + self.rect.size.x >= camera.canvas_size().x
         {
-            // Reset position to center.
+            // The ball has reached the left or right bounds of the canvas. Reset its position.
             self.rect.center_on(0, 0);
             self.velocity.y = 0.0;
         } else if canvas_position.y < 0
             || canvas_position.y as u32 + self.rect.size.y >= camera.canvas_size().y
         {
+            // The ball has reached the top or bottom bounds of the canvas. Invert its y velocity.
             self.velocity.y *= -1.0;
         } else {
+            // Check if the ball has collided with any of the two paddles.
             let paddle1 = self.paddle1.lock().unwrap();
             let paddle2 = self.paddle2.lock().unwrap();
             if paddle1.rect.intersects(&self.rect) {
@@ -160,22 +164,17 @@ fn main() {
     let mut renderer = Renderer::default().with_camera_entity(&camera);
     let paddle1 = entity!(Paddle::new(-400, Keycode::W, Keycode::S));
     let paddle2 = entity!(Paddle::new(400, Keycode::Up, Keycode::Down));
-    let ball = entity!(Ball::new(
-        camera,
-        entity_clone!(paddle1),
-        entity_clone!(paddle2)
-    ));
+    // The ball needs to know the positions of the paddles. Thus, references to the paddles are
+    // passed to the ball. Unlike the paddles, the camera is consumed because it is not referred to
+    // after this point.
+    let ball = entity!(Ball::new(camera, &paddle1, &paddle2));
     let mut game = Game::default();
-    game.update_entities.push(&entity_clone!(Update, ball));
-    game.fixed_update_entities.extend_from_slice(&entity_slice!(
-        FixedUpdate,
-        paddle1,
-        paddle2,
-        ball
-    ));
+    game.update_entities.add_entities(&entities!(Update; ball));
+    game.fixed_update_entities
+        .add_entities(&entities!(FixedUpdate; paddle1, paddle2, ball));
     game.renderable_entities
-        .extend_from_slice(&entity_slice!(Renderable, paddle1, paddle2, ball));
+        .add_entities(&entities!(Renderable; paddle1, paddle2, ball));
     game.interactive_entities
-        .extend_from_slice(&entity_slice!(Interactive, paddle1, paddle2));
+        .add_entities(&entities!(Interactive; paddle1, paddle2));
     game.start(&mut renderer).unwrap();
 }

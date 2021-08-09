@@ -1,6 +1,6 @@
 use ctrait::{
     camera::Camera,
-    entity, entity_clone,
+    entities, entity,
     game::{Entity, EntityContainer, Game},
     math::Vector2,
     rect::Rect,
@@ -47,6 +47,8 @@ struct Spawner {
     movement: Movement,
     renderable_entities: EntityContainer<dyn Renderable>,
     fixed_update_entities: EntityContainer<dyn FixedUpdate>,
+    // Vector owning all instantiated blocks. This makes it easy to manage the blocks after they
+    // have been instantiated.
     blocks: Vec<Entity<Block>>,
 }
 
@@ -60,6 +62,7 @@ impl Spawner {
         Self {
             rect: Rect::from_center(0, -200, 100, 20).with_color(&Color::GREEN),
             movement: Movement::default(),
+            // Clone the entity containers.
             renderable_entities: renderable_entities.clone(),
             fixed_update_entities: fixed_update_entities.clone(),
             blocks: Vec::new(),
@@ -70,7 +73,7 @@ impl Spawner {
 impl Update for Spawner {
     fn update(&mut self, _: f64) {
         // The internal implementation of EntityContainer means that if an entity is dropped, its
-        // references in the corresponding container(s) will be removed.
+        // references in the corresponding container(s) will also be removed.
         self.blocks
             .retain(|block| block.lock().unwrap().rect.position.y < 100);
     }
@@ -91,9 +94,9 @@ impl Interactive for Spawner {
                     // Instantiate a block.
                     let block = entity!(Block::new(&self.rect.center()));
                     self.renderable_entities
-                        .push(&entity_clone!(Renderable, block));
+                        .add_entities(&entities!(Renderable; block));
                     self.fixed_update_entities
-                        .push(&entity_clone!(FixedUpdate, block));
+                        .add_entities(&entities!(FixedUpdate; block));
                     // blocks is the new owner of the newly-instantiated block entity.
                     self.blocks.push(block);
                 }
@@ -133,18 +136,21 @@ impl Renderable for Spawner {
 fn main() {
     let mut game = Game::default();
     let mut renderer = Renderer::default().with_camera(Camera::default());
+    // References to entity containers are passed to spawner to allow it to instantiate entities
+    // during run-time.
     let spawner = entity!(Spawner::new(
         &game.renderable_entities,
         &game.fixed_update_entities
     ));
-    game.update_entities.push(&entity_clone!(Update, spawner));
+    game.update_entities
+        .add_entities(&entities!(Update; spawner));
     game.interactive_entities
-        .push(&entity_clone!(Interactive, spawner));
+        .add_entities(&entities!(Interactive; spawner));
     game.fixed_update_entities
-        .push(&entity_clone!(FixedUpdate, spawner));
+        .add_entities(&entities!(FixedUpdate; spawner));
     game.fixed_update_entities
-        .push(&entity_clone!(FixedUpdate, spawner));
+        .add_entities(&entities!(FixedUpdate; spawner));
     game.renderable_entities
-        .push(&entity_clone!(Renderable, spawner));
+        .add_entities(&entities!(Renderable; spawner));
     game.start(&mut renderer).unwrap();
 }

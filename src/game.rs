@@ -35,73 +35,34 @@ macro_rules! entity {
     };
 }
 
-/// Macro to clone an existing entity.
-///
-/// This does not clone the entity's inner type, rather it creates another pointer to it.
-///
-/// Optionally, an additional trait can be passed to coerce the cloned entity to a specific trait
-/// object.
-///
-/// # Example
-/// ```
-/// use ctrait::{game::Entity, entity, entity_clone, traits::Update};
-///
-/// struct Foo;
-///
-/// impl Update for Foo {
-///     fn update(&mut self, _: f64) {}
-/// }
-///
-/// let foo = entity!(Foo {});
-/// let foo_clone: Entity<Foo> = entity_clone!(foo);
-/// // Coerce foo into a specific trait object.
-/// let foo_update_clone: Entity<dyn Update> = entity_clone!(Update, foo);
-/// ```
-#[macro_export]
-macro_rules! entity_clone {
-    ($entity:expr) => {
-        std::sync::Arc::clone(&$entity)
-    };
-    ($name:ident, $entity:expr) => {
-        ctrait::entity_clone!($entity) as ctrait::game::Entity<dyn $name>
-    };
-}
-
 /// Macro to define a slice of cloned entities that all implement a given trait.
 ///
 /// The first argument should be a trait that all following entities implement.
-/// The macro is mainly useful when passing entities to [`Game`] as a slice.
+/// The macro is mainly useful when passing entities to [`Game`] as a slice with
+/// [`EntityContainer::add_entities`].
 ///
 /// # Example
 /// ```
-/// use ctrait::{
-///     camera::Camera,
-///     entity, entity_slice,
-///     game::Game,
-///     render::RenderContext,
-///     traits::Renderable
-/// };
+/// use ctrait::{entity, entities, game::Entity};
+///
+/// trait FooTrait {}
 ///
 /// struct A;
-/// impl Renderable for A {
-///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
-/// }
+/// impl FooTrait for A {}
+///
 /// struct B;
-/// impl Renderable for B {
-///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
-/// }
+/// impl FooTrait for B {}
 ///
 /// let a = entity!(A {});
 /// let b = entity!(B {});
-///
-/// // Pass a slice of Renderable entities to the game.
-/// let mut game = Game::default();
-/// game.renderable_entities.extend_from_slice(&entity_slice!(Renderable, a, b));
+/// let foo_entities: &[Entity<dyn FooTrait>] = &entities!(FooTrait; a, b);
+/// // Although entities a and b are derived from different types, they are both coerced to trait
+/// // objects and can be stored together in foo_entities.
 /// ```
 #[macro_export]
-macro_rules! entity_slice {
-    ($name:ident, $($entity:expr),+) => {
-        [$(ctrait::entity_clone!($name, $entity)),+]
+macro_rules! entities {
+    ($name:ident; $($entity:expr),+) => {
+        [$(ctrait::game::Entity::clone(&$entity) as ctrait::game::Entity<dyn $name>),+]
     };
 }
 
@@ -121,15 +82,37 @@ impl<T: ?Sized> Clone for EntityContainer<T> {
 }
 
 impl<T: ?Sized> EntityContainer<T> {
-    /// Append a new entity to the entity container.
-    pub fn push(&mut self, entity: &Entity<T>) {
-        self.0.lock().unwrap().push(Arc::downgrade(entity));
-    }
-
     /// Add entities from a given entity slice.
     ///
-    /// It is recommended to create the entity slice with [`entity_slice`].
-    pub fn extend_from_slice(&mut self, other: &[Entity<T>]) {
+    /// It is recommended to create the entity slice with [`entities`].
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{
+    ///     camera::Camera,
+    ///     entity, entities,
+    ///     game::Game,
+    ///     render::RenderContext,
+    ///     traits::Renderable
+    /// };
+    ///
+    /// struct A;
+    /// impl Renderable for A {
+    ///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
+    /// }
+    /// struct B;
+    /// impl Renderable for B {
+    ///     fn render(&self, _: &Camera, _: &mut RenderContext) {}
+    /// }
+    ///
+    /// let a = entity!(A {});
+    /// let b = entity!(B {});
+    ///
+    /// // Pass a slice of Renderable entities to the game.
+    /// let mut game = Game::default();
+    /// game.renderable_entities.add_entities(&entities!(Renderable; a, b));
+    /// ```
+    pub fn add_entities(&mut self, other: &[Entity<T>]) {
         for entity in other.iter() {
             self.push(entity);
         }
@@ -138,6 +121,11 @@ impl<T: ?Sized> EntityContainer<T> {
     /// Clears the entity container, removing all entities.
     pub fn clear(&mut self) {
         self.0.lock().unwrap().clear();
+    }
+
+    // Append a new entity to the entity container.
+    fn push(&mut self, entity: &Entity<T>) {
+        self.0.lock().unwrap().push(Arc::downgrade(entity));
     }
 
     fn prune(entities: &mut Vec<WeakEntity<T>>) {
@@ -256,7 +244,6 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use super::{Arc, EntityContainer};
-    use crate::{entity, entity_clone};
 
     // Test struct to create test entity.
     struct Test;
@@ -276,16 +263,16 @@ mod tests {
     fn game_entity_container_push() {
         let entity = entity!(Test {});
         let mut container = EntityContainer::default();
-        container.push(&entity_clone!(entity));
+        container.push(&entity);
         assert_eq!(container.0.lock().unwrap().len(), 1);
     }
 
     #[test]
-    fn game_entity_container_extend_from_slice() {
+    fn game_entity_container_add_entities() {
         let a = entity!(Test {});
         let b = entity!(Test {});
         let mut container = EntityContainer::default();
-        container.extend_from_slice(&[a, b]);
+        container.add_entities(&[a, b]);
         assert_eq!(container.0.lock().unwrap().len(), 2);
     }
 
@@ -316,6 +303,8 @@ mod tests {
         let a = entity!(Test {});
         let b = entity!(Test {});
         let container = EntityContainer::default();
+        // Intentional avoidance of EntityContainer::add_entities. This function is tested
+        // elsewhere.
         container
             .0
             .lock()
