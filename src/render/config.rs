@@ -1,5 +1,14 @@
 use crate::error::CtraitResult;
-use sdl2::{video::Window, VideoSubsystem};
+use sdl2::{render::WindowCanvas, video::Window, VideoSubsystem};
+
+// Macro to quickly set builder pattern style flag based on condition.
+macro_rules! set_flag {
+    ($self:ident, $value:expr, $flag:ident) => {
+        if $self.$flag {
+            $value = $value.$flag();
+        }
+    };
+}
 
 /// Configuration for [`Renderer`](crate::render::Renderer).
 #[derive(Debug)]
@@ -13,6 +22,8 @@ pub struct RendererConfig {
     pub title: String,
     /// Position of the window.
     pub position: Option<(i32, i32)>,
+    /// Centers the window.
+    pub position_centered: bool,
     /// Set the window to start in fullscreen mode.
     pub fullscreen: bool,
     /// Allow the window to be usable with OpenGL context.
@@ -33,6 +44,10 @@ pub struct RendererConfig {
     pub allow_highdpi: bool,
     /// Allow the window to be usable with Vulkan instance.
     pub vulkan: bool,
+    /// Use hardware acceleration.
+    pub accelerated: bool,
+    /// Use VSync.
+    pub present_vsync: bool,
 }
 
 impl RendererConfig {
@@ -54,28 +69,34 @@ impl RendererConfig {
         }
     }
 
-    // Apply configuration to build window.
-    pub(crate) fn get_window(&self, video_subsystem: &VideoSubsystem) -> CtraitResult<Window> {
+    fn get_window(&self, video_subsystem: &VideoSubsystem) -> CtraitResult<Window> {
         let (width, height) = self.dimensions();
         let mut window = &mut video_subsystem.window(&self.title, width, height);
-        macro_rules! set_flag {
-            ($flag:expr, $new:expr) => {
-                if $flag {
-                    window = $new;
-                }
-            };
+        if let Some((x, y)) = self.position {
+            window.position(x, y);
         }
-        set_flag!(self.fullscreen, window.fullscreen());
-        set_flag!(self.opengl, window.opengl());
-        set_flag!(self.borderless, window.borderless());
-        set_flag!(self.resizable, window.resizable());
-        set_flag!(self.minimized, window.minimized());
-        set_flag!(self.maximized, window.maximized());
-        set_flag!(self.input_grabbed, window.input_grabbed());
-        set_flag!(self.fullscreen_desktop, window.fullscreen_desktop());
-        set_flag!(self.allow_highdpi, window.allow_highdpi());
-        set_flag!(self.vulkan, window.vulkan());
+        set_flag!(self, window, position_centered);
+        set_flag!(self, window, fullscreen);
+        set_flag!(self, window, opengl);
+        set_flag!(self, window, borderless);
+        set_flag!(self, window, resizable);
+        set_flag!(self, window, minimized);
+        set_flag!(self, window, maximized);
+        set_flag!(self, window, input_grabbed);
+        set_flag!(self, window, fullscreen_desktop);
+        set_flag!(self, window, allow_highdpi);
+        set_flag!(self, window, vulkan);
         Ok(window.build()?)
+    }
+
+    pub(crate) fn get_canvas(
+        &self,
+        video_subsystem: &VideoSubsystem,
+    ) -> CtraitResult<WindowCanvas> {
+        let mut canvas = self.get_window(video_subsystem)?.into_canvas();
+        set_flag!(self, canvas, accelerated);
+        set_flag!(self, canvas, present_vsync);
+        Ok(canvas.build()?)
     }
 }
 
@@ -85,6 +106,7 @@ impl Default for RendererConfig {
             title: String::from("ctrait"),
             dimensions: None,
             position: None,
+            position_centered: false,
             fullscreen: false,
             opengl: false,
             borderless: false,
@@ -96,6 +118,8 @@ impl Default for RendererConfig {
             fullscreen_desktop: false,
             allow_highdpi: false,
             vulkan: false,
+            accelerated: false,
+            present_vsync: false,
         }
     }
 }

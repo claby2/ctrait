@@ -190,8 +190,7 @@ impl Game {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;
         let video_subsystem = sdl_context.video()?;
-        let window = renderer.config.get_window(&video_subsystem)?;
-        let canvas = window.into_canvas().build()?;
+        let canvas = renderer.config.get_canvas(&video_subsystem)?;
         let texture_creator = canvas.texture_creator();
         let texture_manager = TextureManager::new(&texture_creator);
         let mut render_context = RenderContext::new(canvas, texture_manager);
