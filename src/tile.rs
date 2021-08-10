@@ -1,7 +1,13 @@
 //! Utilities related to creating a tilemap.
 use crate::{
-    camera::Camera, math::Vector2, rect::Rect, render::RenderContext, sprite::Sprite,
-    traits::Renderable, Color,
+    camera::Camera,
+    error::{CtraitError, CtraitResult},
+    math::Vector2,
+    rect::Rect,
+    render::RenderContext,
+    sprite::Sprite,
+    traits::Renderable,
+    Color,
 };
 use std::ops::{Index, IndexMut};
 
@@ -18,9 +24,9 @@ impl<const ROWS: usize, const COLUMNS: usize> Default for TileLayout<ROWS, COLUM
 impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// Create a new layout from the given slice.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// This will panic if the slice is not of appropriate size.
+    /// This will return an error if the slice is not of appropriate size.
     /// For a tile layout of [`TileLayout<ROWS, COLUMNS>`], the slice should have a length equal to `ROWS` * `COLUMNS`.
     ///
     /// # Example
@@ -40,7 +46,7 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     ///    Some(1),
     ///    None,
     /// ]; // Slice has length of 9 = 3 * 3.
-    /// let tile_layout = TileLayout::<3, 3>::new(&layout);
+    /// let tile_layout = TileLayout::<3, 3>::new(&layout).unwrap();
     /// assert_eq!(tile_layout[1][0], Some(2));
     /// ```
     ///
@@ -51,16 +57,17 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// use ctrait::tile::TileLayout;
     ///
     /// let layout = [Some(1), Some(1), None]; // Slice has length of 3.
-    /// let tile_layout = TileLayout::<2, 3>::new(&layout); // Expects slice of length 6.
+    /// let tile_layout = TileLayout::<2, 3>::new(&layout).unwrap(); // Expects slice of length 6.
     /// ```
-    pub fn new(layout: &[Option<usize>]) -> Self {
-        assert_eq!(
-            layout.len(),
-            ROWS * COLUMNS,
-            "number of elements in layout must be equal to {}",
-            ROWS * COLUMNS
-        );
-        Self(layout.to_vec())
+    pub fn new(layout: &[Option<usize>]) -> CtraitResult<Self> {
+        if layout.len() != ROWS * COLUMNS {
+            Err(CtraitError::Other(format!(
+                "number of elements in layout must be equal to {}",
+                ROWS * COLUMNS
+            )))
+        } else {
+            Ok(Self(layout.to_vec()))
+        }
     }
 }
 
@@ -159,7 +166,8 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///     Some(0),
     ///     Some(0),
     ///     None,
-    /// ]));
+    /// ])
+    /// .unwrap());
     /// ```
     pub fn with_layout(mut self, layout: &TileLayout<ROWS, COLUMNS>) -> Self {
         self.layout = layout.clone();
@@ -221,13 +229,13 @@ mod tests {
 
     #[test]
     fn tile_layout_new() {
-        let tile_layout = TileLayout::<3, 2>::new(&[None; 6]);
+        let tile_layout = TileLayout::<3, 2>::new(&[None; 6]).unwrap();
         assert_eq!(tile_layout.0.len(), 6);
     }
 
     #[test]
-    #[should_panic]
-    fn tile_layout_new_panic() {
-        TileLayout::<3, 2>::new(&[]);
+    fn tile_layout_new_error() {
+        let result = TileLayout::<3, 2>::new(&[None]);
+        assert!(result.is_err());
     }
 }

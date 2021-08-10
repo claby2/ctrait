@@ -23,14 +23,17 @@ impl World {
                 64,
             )
             // The layout represents how the tiles are arranged.
-            .with_layout(&TileLayout::new(&[
-                Some(0), // Red tile will be rendered at the top-left.
-                None,    // No tile will be rendered.
-                Some(1), // White tile will be rendered.
-                Some(1),
-                Some(0),
-                None,
-            ])),
+            .with_layout(
+                &TileLayout::new(&[
+                    Some(0), // Red tile will be rendered at the top-left.
+                    None,    // No tile will be rendered.
+                    Some(1), // White tile will be rendered.
+                    Some(1),
+                    Some(0),
+                    None,
+                ])
+                .unwrap(),
+            ),
         }
     }
 }
