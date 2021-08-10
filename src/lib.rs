@@ -56,6 +56,7 @@ pub mod game;
 pub mod rect;
 pub mod render;
 pub mod sprite;
+pub mod tile;
 pub mod traits;
 
 // Re-export.
