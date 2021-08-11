@@ -1,6 +1,6 @@
 use crate::{
     camera::Camera,
-    game::{Entity, EntityContainer},
+    entity::{Entity, EntityContainer},
     render::{RenderContext, RendererConfig},
     traits::{Interactive, Renderable},
 };

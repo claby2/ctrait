@@ -15,7 +15,7 @@ use std::{
 };
 
 /// 2D layout for a [`Tilemap`].
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TileLayout<const ROWS: usize, const COLUMNS: usize>(Vec<Option<usize>>);
 
 impl<const ROWS: usize, const COLUMNS: usize> Default for TileLayout<ROWS, COLUMNS> {
@@ -93,7 +93,7 @@ impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TileLayout<ROW
 ///
 /// Each tile in a [`Tilemap`] can either be a sprite ([`Sprite`](Self::Sprite)) or colored square
 /// ([`Color`](Self::Color)).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TileType {
     /// Represents a sprite tile, holding a [`PathBuf`] to the sprite texture.
     Sprite(PathBuf),
@@ -222,7 +222,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Renderable for Tilemap<ROWS, COLUM
 
 #[cfg(test)]
 mod tests {
-    use super::TileLayout;
+    use super::{Color, PathBuf, TileLayout, TileType, Tilemap, Vector2};
 
     #[test]
     fn tile_layout_default() {
@@ -244,5 +244,52 @@ mod tests {
     fn tile_layout_new_error() {
         let result = TileLayout::<3, 2>::new(&[None]);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn tile_layout_index() {
+        let tile_layout = TileLayout::<2, 2>::new(&[None, None, Some(0), None]).unwrap();
+        assert_eq!(tile_layout[1][0], Some(0));
+    }
+
+    #[test]
+    fn tile_layout_index_mut() {
+        let mut tile_layout = TileLayout::<2, 2>::new(&[None, None, None, None]).unwrap();
+        tile_layout[1][0] = Some(0);
+        assert_eq!(tile_layout[1][0], Some(0));
+    }
+
+    #[test]
+    fn tilemap_new() {
+        let tilemap = Tilemap::<10, 5>::new(
+            &[
+                TileType::Color(Color::RED),
+                TileType::Sprite(PathBuf::from("texture.png")),
+            ],
+            64,
+        );
+        assert_eq!(tilemap.position, Vector2::new(0, 0));
+        assert_eq!(tilemap.layout, TileLayout::default());
+        assert_eq!(
+            tilemap.tile_set,
+            vec![
+                TileType::Color(Color::RED),
+                TileType::Sprite(PathBuf::from("texture.png"))
+            ]
+        );
+        assert_eq!(tilemap.tile_size, 64);
+    }
+
+    #[test]
+    fn tilemap_with_position() {
+        let tilemap = Tilemap::<1, 1>::new(&[], 0).with_position(&Vector2::new(5, 3));
+        assert_eq!(tilemap.position, Vector2::new(5, 3));
+    }
+
+    #[test]
+    fn tilemap_with_layout() {
+        let tile_layout = TileLayout::<1, 2>::new(&[None, None]).unwrap();
+        let tilemap = Tilemap::new(&[], 0).with_layout(&tile_layout);
+        assert_eq!(tilemap.layout, tile_layout);
     }
 }

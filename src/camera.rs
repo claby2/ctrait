@@ -58,6 +58,15 @@ mod tests {
     use super::{Camera, Vector2};
 
     #[test]
+    fn camera_canvas_size() {
+        let camera = Camera {
+            canvas_size: Vector2::new(50, 50),
+            ..Default::default()
+        };
+        assert_eq!(*camera.canvas_size(), camera.canvas_size);
+    }
+
+    #[test]
     fn camera_get_world_position() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),

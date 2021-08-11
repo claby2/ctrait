@@ -1,7 +1,8 @@
 use ctrait::{
     camera::Camera,
     entities, entity,
-    game::{Entity, Game},
+    entity::Entity,
+    game::Game,
     math::Vector2,
     rect::Rect,
     render::{RenderContext, Renderer},

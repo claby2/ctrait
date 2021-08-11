@@ -47,3 +47,15 @@ impl Renderable for Sprite {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{PathBuf, Rect, Sprite};
+
+    #[test]
+    fn sprite_new() {
+        let sprite_path: PathBuf = PathBuf::from("image.png");
+        let sprite = Sprite::new(&sprite_path, &Rect::from_center(20, 20, 5, 5));
+        assert_eq!(sprite.path.to_str(), Some("image.png"));
+    }
+}

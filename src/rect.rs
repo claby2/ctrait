@@ -182,6 +182,14 @@ mod tests {
     use super::{Camera, CanvasRect, Color, Rect, Vector2};
 
     #[test]
+    fn rect_default() {
+        let rect = Rect::default();
+        assert_eq!(rect.position, Vector2::new(0, 0));
+        assert_eq!(rect.size, Vector2::new(0, 0));
+        assert_eq!(rect.color, None);
+    }
+
+    #[test]
     fn rect_from_center() {
         let rect = Rect::from_center(0, 0, 10, 20);
         assert_eq!(rect, Rect::new(-5, -10, 10, 20));
@@ -197,6 +205,13 @@ mod tests {
     fn rect_center() {
         let rect = Rect::new(0, 0, 10, 20);
         assert_eq!(rect.center(), Vector2::new(5, 10));
+    }
+
+    #[test]
+    fn rect_center_on() {
+        let mut rect = Rect::from_center(0, 0, 10, 10);
+        rect.center_on(5, 5);
+        assert_eq!(rect.center(), Vector2::new(5, 5));
     }
 
     #[test]
@@ -238,6 +253,7 @@ mod tests {
         let a = Rect::new(0, 0, 10, 10);
         let b = Rect::new(9, 9, 10, 3);
         assert!(a.intersects(&b));
+        assert!(b.intersects(&a));
     }
 
     #[test]
@@ -245,5 +261,15 @@ mod tests {
         let a = Rect::new(0, 0, 10, 10);
         let b = Rect::new(11, 11, 10, 10);
         assert!(!a.intersects(&b));
+        assert!(!b.intersects(&a));
+    }
+
+    #[test]
+    fn rect_no_intersects_empty() {
+        // a is empty.
+        let a = Rect::new(0, 0, 10, 0);
+        let b = Rect::new(9, 9, 10, 3);
+        assert!(!a.intersects(&b));
+        assert!(!b.intersects(&a));
     }
 }
