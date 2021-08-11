@@ -5,7 +5,8 @@ use sdl2::event::Event;
 
 /// A type that should update every game loop iteration.
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::traits::Update;
 ///
@@ -27,7 +28,8 @@ pub trait Update: Send {
 ///
 /// This should be used instead of [`Update`] for time-dependent operations.
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::traits::FixedUpdate;
 ///
@@ -48,7 +50,8 @@ pub trait FixedUpdate: Send {
 
 /// A type that is responsive to user events.
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::{Event, traits::Interactive};
 ///
@@ -81,7 +84,8 @@ pub trait Interactive: Send {
 
 /// A type that can be rendered.
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::{camera::Camera, render::RenderContext, traits::Renderable};
 ///

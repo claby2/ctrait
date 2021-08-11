@@ -32,12 +32,13 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// This will return an error if the slice is not of appropriate size.
     /// For a tile layout of [`TileLayout<ROWS, COLUMNS>`], the slice should have a length equal to `ROWS` * `COLUMNS`.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// The following example creates a `3x3` tile layout:
     ///
     /// ```
     /// use ctrait::tile::TileLayout;
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let layout = [
     ///    None,
     ///    Some(1),
@@ -49,8 +50,11 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     ///    Some(1),
     ///    None,
     /// ]; // Slice has length of 9 = 3 * 3.
-    /// let tile_layout = TileLayout::<3, 3>::new(&layout).unwrap();
+    ///
+    /// let tile_layout = TileLayout::<3, 3>::new(&layout)?;
     /// assert_eq!(tile_layout[1][0], Some(2));
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// The following example should panic as the slice's length does not match the specified tile
@@ -59,8 +63,11 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// ```should_panic
     /// use ctrait::tile::TileLayout;
     ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let layout = [Some(1), Some(1), None]; // Slice has length of 3.
-    /// let tile_layout = TileLayout::<2, 3>::new(&layout).unwrap(); // Expects slice of length 6.
+    /// let tile_layout = TileLayout::<2, 3>::new(&layout)?; // Expects slice of length 6.
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn new(layout: &[Option<usize>]) -> CtraitResult<Self> {
         if layout.len() != ROWS * COLUMNS {
@@ -118,7 +125,8 @@ pub struct Tilemap<const ROWS: usize, const COLUMNS: usize> {
 impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// Creates a new tilemap with a tile set and the size of each tile in pixels.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{Color, tile::{Tilemap, TileType}};
     /// use std::path::PathBuf;
@@ -141,7 +149,8 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
 
     /// Constructs tilemap with a specified center world position.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{math::Vector2, tile::Tilemap};
     ///
@@ -155,13 +164,15 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
 
     /// Constructs tilemap with a specified layout.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{
     ///     tile::{TileLayout, TileType, Tilemap},
     ///     Color,
     /// };
     ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let tilemap = Tilemap::<2, 3>::new(
     ///     &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
     ///     64,
@@ -173,8 +184,9 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///     Some(1),
     ///     Some(0),
     ///     None,
-    /// ])
-    /// .unwrap());
+    /// ])?);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn with_layout(mut self, layout: &TileLayout<ROWS, COLUMNS>) -> Self {
         self.layout = layout.clone();

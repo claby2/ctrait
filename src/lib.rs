@@ -1,9 +1,11 @@
 #![warn(missing_docs)]
 
 //! # ctrait
+//!
 //! Trait-based game engine for Rust programmers.
 //!
 //! # Basic Example
+//!
 //! The following is a basic example which simply renders a red square.
 //!
 //! ```no_run
@@ -39,6 +41,7 @@
 //!     }
 //! }
 //!
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let mut renderer = Renderer::default().with_camera(Camera::default());
 //!
 //! let player = entity!(Player::new());
@@ -47,7 +50,9 @@
 //! // Register the player entity as a Renderable entity.
 //! game.renderable_entities
 //!     .add_entities(&entities!(Renderable; player));
-//! game.start(&mut renderer).unwrap();
+//! game.start(&mut renderer)?;
+//! # Ok(())
+//! # }
 //! ```
 
 pub mod camera;

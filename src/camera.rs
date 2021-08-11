@@ -20,12 +20,14 @@ impl Default for Camera {
 impl Camera {
     /// Constructs a new camera with a given world position.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{camera::Camera, math::Vector2};
     ///
     /// let camera = Camera::new(Vector2::new(5, 10));
     /// // camera is located at world position (5, 10).
+    /// assert_eq!(camera.position, Vector2::new(5, 10));
     /// ```
     pub fn new(position: Vector2<i32>) -> Self {
         Self {
@@ -38,7 +40,8 @@ impl Camera {
     ///
     /// The value is internally updated once per game loop iteration.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::camera::Camera;
     ///

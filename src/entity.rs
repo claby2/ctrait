@@ -8,7 +8,8 @@ type WeakEntity<T> = Weak<Mutex<T>>;
 
 /// Macro to quickly create a new entity.
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::entity;
 ///
@@ -30,7 +31,8 @@ macro_rules! entity {
 /// The macro is mainly useful when passing entities to [`Game`](crate::game::Game) as a slice with
 /// [`EntityContainer::add_entities`].
 ///
-/// # Example
+/// # Examples
+///
 /// ```
 /// use ctrait::{entity, entities, entity::Entity};
 ///
@@ -74,7 +76,8 @@ impl<T: ?Sized> Clone for EntityContainer<T> {
 impl<T: ?Sized> EntityContainer<T> {
     /// Constructs a new entity container.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{entity::EntityContainer, traits::Renderable};
     ///
@@ -88,7 +91,8 @@ impl<T: ?Sized> EntityContainer<T> {
     ///
     /// It is recommended to create the entity slice with [`entities`].
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{
     ///     camera::Camera,
@@ -111,7 +115,7 @@ impl<T: ?Sized> EntityContainer<T> {
     /// let b = entity!(B {});
     ///
     /// // Pass a slice of Renderable entities to the game.
-    /// let mut game = Game::default();
+    /// let mut game = Game::new();
     /// game.renderable_entities.add_entities(&entities!(Renderable; a, b));
     /// ```
     pub fn add_entities(&mut self, other: &[Entity<T>]) {

@@ -17,7 +17,8 @@ impl Sprite {
     ///
     /// When rendered, the given texture path will be rendered onto the given [`Rect`].
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{rect::Rect, sprite::Sprite};
     /// use std::path::PathBuf;

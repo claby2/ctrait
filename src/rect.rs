@@ -29,7 +29,8 @@ impl Rect {
     ///
     /// `x` and `y` represent the top-left corner of the rectangle.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{math::Vector2, rect::Rect};
     ///
@@ -47,7 +48,8 @@ impl Rect {
 
     /// Constructs a new rectangle with the given x and y coordinates as the rectangle's center position.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{math::Vector2, rect::Rect};
     ///
@@ -66,7 +68,8 @@ impl Rect {
 
     /// Construct rectangle with given color.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{rect::Rect, Color};
     ///
@@ -80,7 +83,8 @@ impl Rect {
 
     /// Returns the center position as a [`Vector2`].
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{math::Vector2, rect::Rect};
     ///
@@ -93,7 +97,8 @@ impl Rect {
 
     /// Centers the rectangle on the given x and y coordinates.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::{math::Vector2, rect::Rect};
     ///
@@ -111,7 +116,8 @@ impl Rect {
 
     /// Returns `true` if the rectangle has no area.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::rect::Rect;
     ///

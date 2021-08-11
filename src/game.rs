@@ -39,7 +39,8 @@ impl Game {
 
     /// Create a new game.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```
     /// use ctrait::game::Game;
     ///
@@ -66,6 +67,10 @@ impl Game {
     /// Start the game with the given renderer.
     ///
     /// This will block until a quit signal is sent.
+    ///
+    /// # Errors
+    ///
+    /// If [`sdl2`] fails to start, a [`CtraitError`](crate::error::CtraitError) variant will be returned.
     pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;

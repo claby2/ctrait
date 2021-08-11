@@ -24,7 +24,8 @@ impl Default for Renderer {
 impl Renderer {
     /// Construct a new renderer with a custom configuration.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```no_run
     /// use ctrait::render::{Renderer, RendererConfig};
     ///
@@ -53,7 +54,8 @@ impl Renderer {
     /// Attach a camera to the renderer.
     /// A camera is **required** to render [`Renderable`] entities.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```no_run
     /// use ctrait::{camera::Camera, render::Renderer};
     ///
@@ -68,7 +70,8 @@ impl Renderer {
     /// Attach a reference counted camera to the renderer.
     /// Useful if you want to refer to the same camera elsewhere.
     ///
-    /// # Example
+    /// # Examples
+    ///
     /// ```no_run
     /// use ctrait::{camera::Camera, entity, render::Renderer};
     ///
