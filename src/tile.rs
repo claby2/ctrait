@@ -177,7 +177,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///     &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
     ///     64,
     /// )
-    /// .with_layout(&TileLayout::new(&[
+    /// .with_layout(TileLayout::new(&[
     ///     Some(0), // Red tile will be rendered at the top-left.
     ///     None,    // No tile will be rendered.
     ///     Some(1), // White tile will be rendered.
@@ -188,8 +188,8 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn with_layout(mut self, layout: &TileLayout<ROWS, COLUMNS>) -> Self {
-        self.layout = layout.clone();
+    pub fn with_layout(mut self, layout: TileLayout<ROWS, COLUMNS>) -> Self {
+        self.layout = layout;
         self
     }
 }
@@ -301,7 +301,7 @@ mod tests {
     #[test]
     fn tilemap_with_layout() {
         let tile_layout = TileLayout::<1, 2>::new(&[None, None]).unwrap();
-        let tilemap = Tilemap::new(&[], 0).with_layout(&tile_layout);
+        let tilemap = Tilemap::new(&[], 0).with_layout(tile_layout.clone());
         assert_eq!(tilemap.layout, tile_layout);
     }
 }

@@ -57,15 +57,15 @@ impl Spawner {
     const SPEED: f64 = 500.0;
 
     fn new(
-        renderable_entities: &EntityContainer<dyn Renderable>,
-        fixed_update_entities: &EntityContainer<dyn FixedUpdate>,
+        renderable_entities: EntityContainer<dyn Renderable>,
+        fixed_update_entities: EntityContainer<dyn FixedUpdate>,
     ) -> Self {
         Self {
             rect: Rect::from_center(0, -200, 100, 20).with_color(&Color::GREEN),
             movement: Movement::default(),
             // Clone the entity containers.
-            renderable_entities: renderable_entities.clone(),
-            fixed_update_entities: fixed_update_entities.clone(),
+            renderable_entities,
+            fixed_update_entities,
             blocks: Vec::new(),
         }
     }
@@ -140,8 +140,8 @@ fn main() {
     // References to entity containers are passed to spawner to allow it to instantiate entities
     // during run-time.
     let spawner = entity!(Spawner::new(
-        &game.renderable_entities,
-        &game.fixed_update_entities
+        EntityContainer::clone(&game.renderable_entities),
+        EntityContainer::clone(&game.fixed_update_entities)
     ));
     game.update_entities
         .add_entities(&entities!(Update; spawner));

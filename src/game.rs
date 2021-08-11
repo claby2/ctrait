@@ -82,7 +82,7 @@ impl Game {
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
-        let fixed_update_entities = self.fixed_update_entities.clone();
+        let fixed_update_entities = EntityContainer::clone(&self.fixed_update_entities);
         let _guard = timer.schedule_repeating(Duration::milliseconds(self.timestep), move || {
             fixed_update_entities
                 .access()

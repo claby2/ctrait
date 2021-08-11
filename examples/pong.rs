@@ -93,13 +93,13 @@ struct Ball {
 
 impl Ball {
     const SPEED: f64 = 800.0;
-    fn new(camera: Entity<Camera>, paddle1: &Entity<Paddle>, paddle2: &Entity<Paddle>) -> Self {
+    fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
         Self {
             rect: Rect::from_center(0, 0, 10, 10).with_color(&Color::WHITE),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
-            paddle1: paddle1.clone(),
-            paddle2: paddle2.clone(),
+            paddle1,
+            paddle2,
         }
     }
 
@@ -162,13 +162,17 @@ impl Renderable for Ball {
 fn main() {
     // Define the camera as an entity so it can be referred to by Ball.
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::default().with_camera_entity(&camera);
+    let mut renderer = Renderer::default().with_camera_entity(Entity::clone(&camera));
     let paddle1 = entity!(Paddle::new(-400, Keycode::W, Keycode::S));
     let paddle2 = entity!(Paddle::new(400, Keycode::Up, Keycode::Down));
     // The ball needs to know the positions of the paddles. Thus, references to the paddles are
     // passed to the ball. Unlike the paddles, the camera is consumed because it is not referred to
     // after this point.
-    let ball = entity!(Ball::new(camera, &paddle1, &paddle2));
+    let ball = entity!(Ball::new(
+        camera,
+        Entity::clone(&paddle1),
+        Entity::clone(&paddle2)
+    ));
     let mut game = Game::new();
     game.update_entities.add_entities(&entities!(Update; ball));
     game.fixed_update_entities

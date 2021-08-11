@@ -175,7 +175,7 @@ mod tests {
     #[test]
     fn entity_container_clone() {
         let container = EntityContainer::<Test>::default();
-        let _container_clone = container.clone();
+        let _container_clone = EntityContainer::clone(&container);
         assert_eq!(Arc::strong_count(&container.0), 2);
     }
 

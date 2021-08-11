@@ -73,15 +73,24 @@ impl Renderer {
     /// # Examples
     ///
     /// ```no_run
-    /// use ctrait::{camera::Camera, entity, render::Renderer};
+    /// use ctrait::{camera::Camera, entity, entity::Entity, render::Renderer};
+    ///
+    /// fn take_camera_entity(camera: Entity<Camera>) {
+    ///     todo!();
+    /// }
     ///
     /// let camera = entity!(Camera::default());
-    /// // camera can now be passed to other entities...
+    ///
+    /// // camera can now be cloned and passed to multiple places...
+    /// take_camera_entity(Entity::clone(&camera));
+    /// take_camera_entity(Entity::clone(&camera));
+    ///
+    /// // There is no need to clone camera here because it is not being used after this point.
     /// let renderer = Renderer::default()
-    ///     .with_camera_entity(&camera);
+    ///     .with_camera_entity(camera);
     /// ```
-    pub fn with_camera_entity(mut self, camera: &Entity<Camera>) -> Self {
-        self.camera = Some(camera.clone());
+    pub fn with_camera_entity(mut self, camera: Entity<Camera>) -> Self {
+        self.camera = Some(camera);
         self
     }
 
@@ -147,7 +156,7 @@ mod tests {
     #[test]
     fn renderer_with_camera_entity() {
         let camera = crate::entity!(Camera::default());
-        let renderer = Renderer::default().with_camera_entity(&camera);
+        let renderer = Renderer::default().with_camera_entity(camera);
         assert!(renderer.camera.is_some());
     }
 }

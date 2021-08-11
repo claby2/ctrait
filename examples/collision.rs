@@ -68,11 +68,11 @@ struct Detector {
 }
 
 impl Detector {
-    fn new(cursor: &Entity<Cursor>) -> Self {
+    fn new(cursor: Entity<Cursor>) -> Self {
         Self {
             rect: Rect::from_center(0, 0, 300, 300),
             colliding: false,
-            cursor: cursor.clone(),
+            cursor,
         }
     }
 }
@@ -98,9 +98,9 @@ impl Renderable for Detector {
 fn main() {
     // Camera is constructed as an entity so it can be referred to by other structs.
     let camera = entity!(Camera::default());
-    let mut renderer = Renderer::default().with_camera_entity(&camera);
+    let mut renderer = Renderer::default().with_camera_entity(Entity::clone(&camera));
     let cursor = entity!(Cursor::new(camera));
-    let detector = entity!(Detector::new(&cursor));
+    let detector = entity!(Detector::new(Entity::clone(&cursor)));
     let mut game = Game::new();
     game.update_entities
         .add_entities(&entities!(Update; cursor, detector));
