@@ -9,7 +9,10 @@ use crate::{
     traits::Renderable,
     Color,
 };
-use std::ops::{Index, IndexMut};
+use std::{
+    ops::{Index, IndexMut},
+    path::PathBuf,
+};
 
 /// 2D layout for a [`Tilemap`].
 #[derive(Debug, Clone)]
@@ -92,8 +95,8 @@ impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TileLayout<ROW
 /// ([`Color`](Self::Color)).
 #[derive(Debug, Clone)]
 pub enum TileType {
-    /// Represents a sprite tile, holding a path to the sprite texture.
-    Sprite(String),
+    /// Represents a sprite tile, holding a [`PathBuf`] to the sprite texture.
+    Sprite(PathBuf),
     /// Represents a colored square tile, holding a [`Color`].
     Color(Color),
 }
@@ -118,11 +121,12 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// # Example
     /// ```
     /// use ctrait::{Color, tile::{Tilemap, TileType}};
+    /// use std::path::PathBuf;
     ///
     /// // Create a tilemap with a set consisting of a red square and sprite.
     /// // Each tile will be rendered with a width and height of 64.
     /// let tilemap = Tilemap::<10, 5>::new(
-    ///     &[TileType::Color(Color::RED), TileType::Sprite("path/to/texture.png".to_string())],
+    ///     &[TileType::Color(Color::RED), TileType::Sprite(PathBuf::from("path/to/texture.png"))],
     ///     64,
     /// );
     /// ```
@@ -153,17 +157,20 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///
     /// # Example
     /// ```
-    /// use ctrait::{Color, tile::{TileLayout, TileType, Tilemap}};
+    /// use ctrait::{
+    ///     tile::{TileLayout, TileType, Tilemap},
+    ///     Color,
+    /// };
     ///
     /// let tilemap = Tilemap::<2, 3>::new(
     ///     &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
     ///     64,
     /// )
     /// .with_layout(&TileLayout::new(&[
-    ///     Some(0),
-    ///     None,
+    ///     Some(0), // Red tile will be rendered at the top-left.
+    ///     None,    // No tile will be rendered.
+    ///     Some(1), // White tile will be rendered.
     ///     Some(1),
-    ///     Some(0),
     ///     Some(0),
     ///     None,
     /// ])
