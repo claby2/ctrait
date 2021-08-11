@@ -4,7 +4,7 @@ use crate::{camera::Camera, math::Vector2, render::RenderContext, traits::Render
 use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 
 /// A rectangle relative to world coordinates.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rect {
     /// Position of top-left corner.
     pub position: Vector2<i32>,
@@ -139,8 +139,8 @@ impl Rect {
 
     // Retrieves the equivalent CanvasRect relative to camera.
     // Will return None if the CanvasRect is outside of the camera's view.
-    pub(crate) fn to_canvas_rect(&self, camera: &Camera) -> Option<CanvasRect> {
-        let mut canvas_rect: CanvasRect = self.clone().into();
+    pub(crate) fn as_canvas_rect(&self, camera: &Camera) -> Option<CanvasRect> {
+        let mut canvas_rect: CanvasRect = (*self).into();
         let new_position = camera.get_canvas_position(self.position);
         canvas_rect.x = new_position.x;
         canvas_rect.y = new_position.y;
@@ -161,7 +161,7 @@ impl Renderable for Rect {
     #[track_caller]
     fn render(&self, camera: &Camera, context: &mut RenderContext) {
         if let Some(color) = self.color {
-            if let Some(canvas_rect) = self.to_canvas_rect(camera) {
+            if let Some(canvas_rect) = self.as_canvas_rect(camera) {
                 context.canvas.set_draw_color(color);
                 context.canvas.fill_rect(canvas_rect).unwrap();
             }
@@ -215,24 +215,24 @@ mod tests {
     }
 
     #[test]
-    fn rect_to_canvas_rect_some() {
+    fn rect_as_canvas_rect_some() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
             ..Default::default()
         };
         let rect = Rect::new(0, 0, 10, 10);
-        let canvas_rect = rect.to_canvas_rect(&camera);
+        let canvas_rect = rect.as_canvas_rect(&camera);
         assert_eq!(canvas_rect, Some(CanvasRect::new(25, 25, 10, 10)));
     }
 
     #[test]
-    fn rect_to_canvas_rect_none() {
+    fn rect_as_canvas_rect_none() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
             ..Default::default()
         };
         let rect = Rect::new(100, 100, 10, 10);
-        let canvas_rect = rect.to_canvas_rect(&camera);
+        let canvas_rect = rect.as_canvas_rect(&camera);
         assert!(canvas_rect.is_none());
     }
 

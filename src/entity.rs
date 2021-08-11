@@ -56,11 +56,12 @@ macro_rules! entities {
 }
 
 /// Structure containing [`Weak`] references to entities.
+#[derive(Debug)]
 pub struct EntityContainer<T: ?Sized>(Arc<Mutex<Vec<WeakEntity<T>>>>);
 
 impl<T: ?Sized> Default for EntityContainer<T> {
     fn default() -> Self {
-        Self(Arc::new(Mutex::new(Vec::new())))
+        Self::new()
     }
 }
 
@@ -71,6 +72,18 @@ impl<T: ?Sized> Clone for EntityContainer<T> {
 }
 
 impl<T: ?Sized> EntityContainer<T> {
+    /// Constructs a new entity container.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{entity::EntityContainer, traits::Renderable};
+    ///
+    /// let entity_container = EntityContainer::<dyn Renderable>::new();
+    /// ```
+    pub fn new() -> Self {
+        Self(Arc::new(Mutex::new(Vec::new())))
+    }
+
     /// Add entities from a given entity slice.
     ///
     /// It is recommended to create the entity slice with [`entities`].
@@ -137,6 +150,12 @@ mod tests {
 
     // Test struct to create test entity.
     struct Test;
+
+    #[test]
+    fn entity_container_new() {
+        let entity_container = EntityContainer::<Test>::new();
+        assert!(entity_container.0.lock().unwrap().is_empty());
+    }
 
     #[test]
     fn entity_access() {

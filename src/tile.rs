@@ -15,7 +15,7 @@ use std::{
 };
 
 /// 2D layout for a [`Tilemap`].
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct TileLayout<const ROWS: usize, const COLUMNS: usize>(Vec<Option<usize>>);
 
 impl<const ROWS: usize, const COLUMNS: usize> Default for TileLayout<ROWS, COLUMNS> {

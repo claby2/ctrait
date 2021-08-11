@@ -46,8 +46,8 @@ impl Renderable for World {
 
 fn main() {
     let mut renderer = Renderer::default().with_camera(Camera::default());
-    let mut game = Game::default();
     let world = entity!(World::new());
+    let mut game = Game::new();
     game.renderable_entities
         .add_entities(&entities!(Renderable; world));
     game.start(&mut renderer).unwrap();

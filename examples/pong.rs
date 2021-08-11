@@ -169,7 +169,7 @@ fn main() {
     // passed to the ball. Unlike the paddles, the camera is consumed because it is not referred to
     // after this point.
     let ball = entity!(Ball::new(camera, &paddle1, &paddle2));
-    let mut game = Game::default();
+    let mut game = Game::new();
     game.update_entities.add_entities(&entities!(Update; ball));
     game.fixed_update_entities
         .add_entities(&entities!(FixedUpdate; paddle1, paddle2, ball));

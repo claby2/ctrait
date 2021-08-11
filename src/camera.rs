@@ -4,7 +4,7 @@ use crate::math::Vector2;
 use sdl2::render::WindowCanvas;
 
 /// Camera with a position used to calculate relative world and canvas positions.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Camera {
     /// World position of the camera.
     pub position: Vector2<i32>,
@@ -13,21 +13,34 @@ pub struct Camera {
 
 impl Default for Camera {
     fn default() -> Self {
-        Self {
-            position: Vector2::new(0, 0),
-            canvas_size: Vector2::new(0, 0),
-        }
+        Self::new(Vector2::new(0, 0))
     }
 }
 
 impl Camera {
+    /// Constructs a new camera with a given world position.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::{camera::Camera, math::Vector2};
+    ///
+    /// let camera = Camera::new(Vector2::new(5, 10));
+    /// // camera is located at world position (5, 10).
+    /// ```
+    pub fn new(position: Vector2<i32>) -> Self {
+        Self {
+            position,
+            canvas_size: Vector2::new(0, 0),
+        }
+    }
+
     /// Retrieves the size of the canvas.
     ///
     /// The value is internally updated once per game loop iteration.
     ///
     /// # Example
     /// ```
-    /// use ctrait::{camera::Camera};
+    /// use ctrait::camera::Camera;
     ///
     /// let camera = Camera::default();
     /// let canvas_size = camera.canvas_size();
@@ -56,6 +69,13 @@ impl Camera {
 #[cfg(test)]
 mod tests {
     use super::{Camera, Vector2};
+
+    #[test]
+    fn camera_new() {
+        let camera = Camera::new(Vector2::new(2, 3));
+        assert_eq!(camera.position, Vector2::new(2, 3));
+        assert_eq!(camera.canvas_size, Vector2::new(0, 0));
+    }
 
     #[test]
     fn camera_canvas_size() {

@@ -101,7 +101,7 @@ fn main() {
     let mut renderer = Renderer::default().with_camera_entity(&camera);
     let cursor = entity!(Cursor::new(camera));
     let detector = entity!(Detector::new(&cursor));
-    let mut game = Game::default();
+    let mut game = Game::new();
     game.update_entities
         .add_entities(&entities!(Update; cursor, detector));
     game.interactive_entities

@@ -29,20 +29,31 @@ pub struct Game {
 
 impl Default for Game {
     fn default() -> Self {
-        Self {
-            update_entities: EntityContainer::default(),
-            fixed_update_entities: EntityContainer::default(),
-            renderable_entities: EntityContainer::default(),
-            interactive_entities: EntityContainer::default(),
-            // Manually implement Default for Game to specify default timestep.
-            timestep: Self::DEFAULT_TIMESTEP,
-        }
+        Self::new()
     }
 }
 
 impl Game {
     /// Default number of milliseconds between [`FixedUpdate::fixed_update`] method calls.
     pub const DEFAULT_TIMESTEP: i64 = ((1.0 / 50.0) * 1000.0) as i64;
+
+    /// Create a new game.
+    ///
+    /// # Example
+    /// ```
+    /// use ctrait::game::Game;
+    ///
+    /// let game = Game::new();
+    /// ```
+    pub fn new() -> Self {
+        Self {
+            update_entities: EntityContainer::default(),
+            fixed_update_entities: EntityContainer::default(),
+            renderable_entities: EntityContainer::default(),
+            interactive_entities: EntityContainer::default(),
+            timestep: Self::DEFAULT_TIMESTEP,
+        }
+    }
 
     /// Customize the delay in milliseconds between [`FixedUpdate::fixed_update`] method calls.
     ///
@@ -59,7 +70,7 @@ impl Game {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;
         let video_subsystem = sdl_context.video()?;
-        let canvas = renderer.config.get_canvas(&video_subsystem)?;
+        let canvas = renderer.config.create_canvas(&video_subsystem)?;
         let texture_creator = canvas.texture_creator();
         let texture_manager = TextureManager::new(&texture_creator);
         let mut render_context = RenderContext::new(canvas, texture_manager);

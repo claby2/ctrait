@@ -69,7 +69,7 @@ impl RendererConfig {
         }
     }
 
-    fn get_window(&self, video_subsystem: &VideoSubsystem) -> CtraitResult<Window> {
+    fn create_window(&self, video_subsystem: &VideoSubsystem) -> CtraitResult<Window> {
         let (width, height) = self.dimensions();
         let mut window = &mut video_subsystem.window(&self.title, width, height);
         if let Some((x, y)) = self.position {
@@ -89,11 +89,11 @@ impl RendererConfig {
         Ok(window.build()?)
     }
 
-    pub(crate) fn get_canvas(
+    pub(crate) fn create_canvas(
         &self,
         video_subsystem: &VideoSubsystem,
     ) -> CtraitResult<WindowCanvas> {
-        let mut canvas = self.get_window(video_subsystem)?.into_canvas();
+        let mut canvas = self.create_window(video_subsystem)?.into_canvas();
         set_flag!(self, canvas, accelerated);
         set_flag!(self, canvas, present_vsync);
         Ok(canvas.build()?)

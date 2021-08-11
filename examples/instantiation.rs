@@ -135,8 +135,8 @@ impl Renderable for Spawner {
 }
 
 fn main() {
-    let mut game = Game::default();
     let mut renderer = Renderer::default().with_camera(Camera::default());
+    let mut game = Game::new();
     // References to entity containers are passed to spawner to allow it to instantiate entities
     // during run-time.
     let spawner = entity!(Spawner::new(

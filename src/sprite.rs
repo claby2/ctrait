@@ -4,7 +4,7 @@ use crate::{camera::Camera, rect::Rect, render::RenderContext, traits::Renderabl
 use std::path::PathBuf;
 
 /// A sprite which holds a path to a texture and a [`Rect`].
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Sprite {
     /// Path to the texture.
     pub path: PathBuf,
@@ -31,14 +31,14 @@ impl Sprite {
     pub fn new<P: Into<PathBuf>>(path: P, rect: &Rect) -> Self {
         Self {
             path: path.into(),
-            rect: rect.clone(),
+            rect: *rect,
         }
     }
 }
 
 impl Renderable for Sprite {
     fn render(&self, camera: &Camera, context: &mut RenderContext) {
-        if let Some(canvas_rect) = self.rect.to_canvas_rect(camera) {
+        if let Some(canvas_rect) = self.rect.as_canvas_rect(camera) {
             let texture = context
                 .texture_manager
                 .load(&self.path.as_os_str().to_string_lossy())

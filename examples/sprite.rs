@@ -39,9 +39,9 @@ fn main() {
         eprintln!("Usage: cargo run /path/to/image.(png|jpg)");
     } else {
         let path = &args[1];
-        let mut game = Game::default();
         let mut renderer = Renderer::default().with_camera(Camera::default());
         let image = entity!(Image::new(path));
+        let mut game = Game::new();
         game.renderable_entities
             .add_entities(&entities!(Renderable; image));
         game.start(&mut renderer).unwrap();
