@@ -26,7 +26,7 @@ impl Renderer {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```
     /// use ctrait::render::{Renderer, RendererConfig};
     ///
     /// // Create renderer with custom configuration.
@@ -56,7 +56,7 @@ impl Renderer {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```
     /// use ctrait::{camera::Camera, render::Renderer};
     ///
     /// let renderer = Renderer::default()
@@ -72,18 +72,20 @@ impl Renderer {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// use ctrait::{camera::Camera, entity, entity::Entity, render::Renderer};
+    /// ```
+    /// use ctrait::{camera::Camera, entity, entity::Entity, render::Renderer, math::Vector2};
     ///
-    /// fn take_camera_entity(camera: Entity<Camera>) {
-    ///     todo!();
+    /// fn increment_camera_x(camera: Entity<Camera>) {
+    ///     camera.lock().unwrap().position.x += 1;
     /// }
     ///
-    /// let camera = entity!(Camera::default());
+    /// let camera = entity!(Camera::new(Vector2::new(0, 0)));
     ///
-    /// // camera can now be cloned and passed to multiple places...
-    /// take_camera_entity(Entity::clone(&camera));
-    /// take_camera_entity(Entity::clone(&camera));
+    /// // camera can now be cloned and passed multiple times.
+    /// increment_camera_x(Entity::clone(&camera));
+    /// increment_camera_x(Entity::clone(&camera));
+    ///
+    /// assert_eq!(camera.lock().unwrap().position.x, 2);
     ///
     /// // There is no need to clone camera here because it is not being used after this point.
     /// let renderer = Renderer::default()
