@@ -71,6 +71,7 @@ pub mod sprite;
 pub mod tile;
 pub mod traits;
 
+pub use nalgebra as math;
+
 // Re-export.
-pub use cgmath as math;
 pub use sdl2::{event::Event, keyboard::Keycode, pixels::Color};

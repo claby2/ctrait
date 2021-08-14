@@ -22,7 +22,7 @@ impl Cursor {
     fn new(camera: Entity<Camera>) -> Self {
         Self {
             rect: Rect::from_center(0.0, 0.0, Self::SIZE, Self::SIZE).with_color(&Color::WHITE),
-            cursor_position: Vector2::new(0.0, 0.0),
+            cursor_position: Vector2::zeros(),
             camera,
         }
     }
@@ -32,7 +32,7 @@ impl Interactive for Cursor {
     fn on_event(&mut self, event: &Event) {
         if let Event::MouseMotion { x, y, .. } = event {
             // Get cursor position relative to canvas.
-            self.cursor_position = Vector2::new(*x, *y).cast().unwrap();
+            self.cursor_position = Vector2::new(*x, *y).cast();
         }
     }
 }
@@ -46,11 +46,9 @@ impl Update for Cursor {
             .lock()
             .unwrap()
             .get_world_position(self.cursor_position);
-        // Set the rect's position to the cursor's world position.
-        self.rect.position = Vector2::new(
-            cursor_world_position.x - (Self::SIZE / 2.0),
-            cursor_world_position.y - (Self::SIZE / 2.0),
-        );
+        // Center the cursor rect to the mouse cursor's world position.
+        self.rect
+            .center_on(cursor_world_position.x, cursor_world_position.y);
     }
 }
 

@@ -81,7 +81,7 @@ impl Renderer {
     ///     camera.lock().unwrap().position.x += 1.0;
     /// }
     ///
-    /// let camera = entity!(Camera::new(Vector2::new(0.0, 0.0)));
+    /// let camera = entity!(Camera::new(Vector2::repeat(0.0)));
     ///
     /// // camera can now be cloned and passed multiple times.
     /// increment_camera_x(Entity::clone(&camera));

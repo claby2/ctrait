@@ -13,7 +13,7 @@ pub struct Camera {
 
 impl Default for Camera {
     fn default() -> Self {
-        Self::new(Vector2::new(0.0, 0.0))
+        Self::new(Vector2::zeros())
     }
 }
 
@@ -33,7 +33,7 @@ impl Camera {
     pub fn new(position: Vector2<f32>) -> Self {
         Self {
             position,
-            canvas_size: Vector2::new(0, 0),
+            canvas_size: Vector2::zeros(),
         }
     }
 
@@ -56,7 +56,7 @@ impl Camera {
     /// ```
     #[must_use]
     pub fn canvas_size(&self) -> Vector2<f32> {
-        self.canvas_size.cast().unwrap()
+        self.canvas_size.cast()
     }
 
     /// Converts the given canvas position to its equivalent world position.
@@ -85,41 +85,41 @@ mod tests {
     fn camera_new() {
         let camera = Camera::new(Vector2::new(2.0, 3.0));
         assert_eq!(camera.position, Vector2::new(2.0, 3.0));
-        assert_eq!(camera.canvas_size, Vector2::new(0, 0));
+        assert_eq!(camera.canvas_size, Vector2::repeat(0));
     }
 
     #[test]
     fn camera_canvas_size() {
         let camera = Camera {
-            canvas_size: Vector2::new(50, 50),
+            canvas_size: Vector2::repeat(50),
             ..Camera::default()
         };
-        assert_eq!(camera.canvas_size(), camera.canvas_size.cast().unwrap());
+        assert_eq!(camera.canvas_size(), camera.canvas_size.cast());
     }
 
     #[test]
     fn camera_get_world_position() {
         let camera = Camera {
-            canvas_size: Vector2::new(50, 50),
+            canvas_size: Vector2::repeat(50),
             ..Camera::default()
         };
-        let canvas_position = Vector2::new(35.0, 35.0);
+        let canvas_position = Vector2::repeat(35.0);
         assert_eq!(
             camera.get_world_position(canvas_position),
-            Vector2::new(10.0, 10.0)
+            Vector2::repeat(10.0)
         );
     }
 
     #[test]
     fn camera_get_canvas_position() {
         let camera = Camera {
-            canvas_size: Vector2::new(50, 50),
+            canvas_size: Vector2::repeat(50),
             ..Camera::default()
         };
-        let world_position = Vector2::new(10.0, 10.0);
+        let world_position = Vector2::repeat(10.0);
         assert_eq!(
             camera.get_canvas_position(world_position),
-            Vector2::new(35.0, 35.0)
+            Vector2::repeat(35.0)
         );
     }
 }

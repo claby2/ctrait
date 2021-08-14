@@ -143,7 +143,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     #[must_use]
     pub fn new(set: &[TileType], tile_size: f32) -> Self {
         Self {
-            position: Vector2::new(0.0, 0.0),
+            position: Vector2::zeros(),
             layout: TileLayout::default(),
             tile_set: set.to_vec(),
             tile_size,
@@ -201,8 +201,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
 
 impl<const ROWS: usize, const COLUMNS: usize> Renderable for Tilemap<ROWS, COLUMNS> {
     fn render(&self, camera: &Camera, context: &mut RenderContext) {
-        let half_tilemap_dimensions =
-            (Vector2::new(COLUMNS as f32, ROWS as f32) * self.tile_size) / 2.;
+        let half_tilemap_dimensions = (Vector2::new(COLUMNS, ROWS).cast() * self.tile_size) / 2.;
         for row in 0..ROWS {
             for column in 0..COLUMNS {
                 let index = self.layout[row][column];
@@ -285,7 +284,7 @@ mod tests {
             ],
             64.0,
         );
-        assert_eq!(tilemap.position, Vector2::new(0.0, 0.0));
+        assert_eq!(tilemap.position, Vector2::zeros());
         assert_eq!(tilemap.layout, TileLayout::default());
         assert_eq!(
             tilemap.tile_set,

@@ -17,8 +17,8 @@ pub struct Rect {
 impl Default for Rect {
     fn default() -> Self {
         Self {
-            position: Vector2::new(0.0, 0.0),
-            size: Vector2::new(0.0, 0.0),
+            position: Vector2::zeros(),
+            size: Vector2::zeros(),
             color: None,
         }
     }
@@ -36,7 +36,7 @@ impl Rect {
     ///
     /// let rect = Rect::new(-5.0, -5.0, 10.0, 10.0);
     /// // rect now represents a rectangle centered at (0, 0).
-    /// assert_eq!(rect.center(), Vector2::new(0.0, 0.0));
+    /// assert_eq!(rect.center(), Vector2::repeat(0.0));
     /// ```
     #[must_use]
     pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
@@ -56,7 +56,7 @@ impl Rect {
     ///
     /// let rect = Rect::from_center(0.0, 0.0, 10.0, 10.0);
     /// // rect now represents a rectangle centered at (0, 0).
-    /// assert_eq!(rect.center(), Vector2::new(0.0, 0.0));
+    /// assert_eq!(rect.center(), Vector2::repeat(0.0));
     /// ```
     #[must_use]
     pub fn from_center(center_x: f32, center_y: f32, width: f32, height: f32) -> Self {
@@ -198,8 +198,8 @@ mod tests {
     #[test]
     fn rect_default() {
         let rect = Rect::default();
-        assert_eq!(rect.position, Vector2::new(0.0, 0.0));
-        assert_eq!(rect.size, Vector2::new(0.0, 0.0));
+        assert_eq!(rect.position, Vector2::zeros());
+        assert_eq!(rect.size, Vector2::zeros());
         assert_eq!(rect.color, None);
     }
 
@@ -225,13 +225,13 @@ mod tests {
     fn rect_center_on() {
         let mut rect = Rect::from_center(0.0, 0.0, 10.0, 10.0);
         rect.center_on(5.0, 5.0);
-        assert_eq!(rect.center(), Vector2::new(5.0, 5.0));
+        assert_eq!(rect.center(), Vector2::repeat(5.0));
     }
 
     #[test]
     fn rect_as_canvas_rect_some() {
         let camera = Camera {
-            canvas_size: Vector2::new(50, 50),
+            canvas_size: Vector2::repeat(50),
             ..Camera::default()
         };
         let rect = Rect::new(0.0, 0.0, 10.0, 10.0);
@@ -242,7 +242,7 @@ mod tests {
     #[test]
     fn rect_as_canvas_rect_none() {
         let camera = Camera {
-            canvas_size: Vector2::new(50, 50),
+            canvas_size: Vector2::repeat(50),
             ..Camera::default()
         };
         let rect = Rect::new(100.0, 100.0, 10.0, 10.0);
