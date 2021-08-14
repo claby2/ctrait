@@ -18,7 +18,7 @@ struct Block {
 impl Block {
     const FALL_SPEED: f64 = 600.0;
 
-    fn new(position: &Vector2<i32>) -> Self {
+    fn new(position: Vector2<i32>) -> Self {
         Self {
             rect: Rect::from_center(position.x, position.y, 50, 50).with_color(&Color::GRAY),
         }
@@ -93,7 +93,7 @@ impl Interactive for Spawner {
                     self.movement.right = true;
                 } else if *keycode == Keycode::Space {
                     // Instantiate a block.
-                    let block = entity!(Block::new(&self.rect.center()));
+                    let block = entity!(Block::new(self.rect.center()));
                     self.renderable_entities
                         .add_entities(&entities!(Renderable; block));
                     self.fixed_update_entities

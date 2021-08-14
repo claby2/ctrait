@@ -8,7 +8,7 @@ use std::fmt::{self, Display, Formatter};
 pub type CtraitResult<T> = Result<T, CtraitError>;
 
 /// Enum representing potential error types.
-#[allow(missing_docs)]
+#[allow(missing_docs, clippy::module_name_repetitions)]
 #[derive(Debug)]
 pub enum CtraitError {
     IntegerOr(IntegerOrSdlError),
@@ -21,12 +21,11 @@ impl Error for CtraitError {}
 
 impl Display for CtraitError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        use CtraitError::*;
         match self {
-            IntegerOr(ref e) => e.fmt(f),
-            UpdateTexture(ref e) => e.fmt(f),
-            WindowBuild(ref e) => e.fmt(f),
-            Other(ref e) => e.fmt(f),
+            CtraitError::IntegerOr(ref e) => e.fmt(f),
+            CtraitError::UpdateTexture(ref e) => e.fmt(f),
+            CtraitError::WindowBuild(ref e) => e.fmt(f),
+            CtraitError::Other(ref e) => e.fmt(f),
         }
     }
 }

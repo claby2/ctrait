@@ -46,6 +46,7 @@ impl Game {
     ///
     /// let game = Game::new();
     /// ```
+    #[must_use]
     pub fn new() -> Self {
         Self {
             update_entities: EntityContainer::default(),
@@ -59,6 +60,7 @@ impl Game {
     /// Customize the delay in milliseconds between [`FixedUpdate::fixed_update`] method calls.
     ///
     /// Default timestep is equal to [`Self::DEFAULT_TIMESTEP`].
+    #[must_use]
     pub fn with_timestep(mut self, timestep: i64) -> Self {
         self.timestep = timestep;
         self
@@ -71,6 +73,10 @@ impl Game {
     /// # Errors
     ///
     /// If [`sdl2`] fails to start, a [`CtraitError`](crate::error::CtraitError) variant will be returned.
+    ///
+    /// # Panics
+    ///
+    /// This function might panic if another user of any of the container panics.
     pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;
@@ -95,7 +101,7 @@ impl Game {
                         .unwrap()
                         .lock()
                         .unwrap()
-                        .fixed_update(fixed_update_instant.elapsed().as_secs_f64())
+                        .fixed_update(fixed_update_instant.elapsed().as_secs_f64());
                 });
             fixed_update_instant = Instant::now();
         });
@@ -114,7 +120,7 @@ impl Game {
                         .unwrap()
                         .lock()
                         .unwrap()
-                        .update(standard_instant.elapsed().as_secs_f64())
+                        .update(standard_instant.elapsed().as_secs_f64());
                 });
             standard_instant = Instant::now();
             if renderer.has_quit() {

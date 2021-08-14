@@ -15,6 +15,7 @@ use std::{
 };
 
 /// 2D layout for a [`Tilemap`].
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct TileLayout<const ROWS: usize, const COLUMNS: usize>(Vec<Option<usize>>);
 
@@ -70,13 +71,13 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// # }
     /// ```
     pub fn new(layout: &[Option<usize>]) -> CtraitResult<Self> {
-        if layout.len() != ROWS * COLUMNS {
+        if layout.len() == ROWS * COLUMNS {
+            Ok(Self(layout.to_vec()))
+        } else {
             Err(CtraitError::Other(format!(
                 "number of elements in layout must be equal to {}",
                 ROWS * COLUMNS
             )))
-        } else {
-            Ok(Self(layout.to_vec()))
         }
     }
 }
@@ -100,6 +101,7 @@ impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TileLayout<ROW
 ///
 /// Each tile in a [`Tilemap`] can either be a sprite ([`Sprite`](Self::Sprite)) or colored square
 /// ([`Color`](Self::Color)).
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum TileType {
     /// Represents a sprite tile, holding a [`PathBuf`] to the sprite texture.
@@ -138,6 +140,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///     64,
     /// );
     /// ```
+    #[must_use]
     pub fn new(set: &[TileType], tile_size: u32) -> Self {
         Self {
             position: Vector2::new(0, 0),
@@ -157,6 +160,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// let tilemap = Tilemap::<4, 4>::new(&[], 8,)
     ///     .with_position(&Vector2::new(5, 10));
     /// ```
+    #[must_use]
     pub fn with_position(mut self, position: &Vector2<i32>) -> Self {
         self.position = *position;
         self
@@ -188,6 +192,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn with_layout(mut self, layout: TileLayout<ROWS, COLUMNS>) -> Self {
         self.layout = layout;
         self

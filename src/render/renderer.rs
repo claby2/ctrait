@@ -36,13 +36,14 @@ impl Renderer {
     ///         dimensions: Some((100, 100)),
     ///         resizable: false,
     ///         // Let all other fields equal to default value.
-    ///         ..Default::default()
+    ///         ..RendererConfig::default()
     ///     }
     /// );
     ///
     /// // Create renderer with default configuration.
     /// let default_renderer = Renderer::default();
     /// ```
+    #[must_use]
     pub fn new(config: RendererConfig) -> Self {
         Self {
             config,
@@ -62,6 +63,7 @@ impl Renderer {
     /// let renderer = Renderer::default()
     ///     .with_camera(Camera::default());
     /// ```
+    #[must_use]
     pub fn with_camera(mut self, camera: Camera) -> Self {
         self.camera = Some(crate::entity!(camera));
         self
@@ -91,6 +93,7 @@ impl Renderer {
     /// let renderer = Renderer::default()
     ///     .with_camera_entity(camera);
     /// ```
+    #[must_use]
     pub fn with_camera_entity(mut self, camera: Entity<Camera>) -> Self {
         self.camera = Some(camera);
         self

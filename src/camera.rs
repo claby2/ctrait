@@ -29,6 +29,7 @@ impl Camera {
     /// // camera is located at world position (5, 10).
     /// assert_eq!(camera.position, Vector2::new(5, 10));
     /// ```
+    #[must_use]
     pub fn new(position: Vector2<i32>) -> Self {
         Self {
             position,
@@ -49,16 +50,19 @@ impl Camera {
     /// let canvas_size = camera.canvas_size();
     /// println!("width: {}, height: {}", canvas_size.x, canvas_size.y);
     /// ```
+    #[must_use]
     pub fn canvas_size(&self) -> &Vector2<u32> {
         &self.canvas_size
     }
 
     /// Converts the given canvas position to its equivalent world position.
+    #[must_use]
     pub fn get_world_position(&self, canvas_position: Vector2<i32>) -> Vector2<i32> {
         canvas_position + self.position - Vector2::cast(&(self.canvas_size / 2)).unwrap()
     }
 
     /// Converts the given world position to its equivalent canvas position.
+    #[must_use]
     pub fn get_canvas_position(&self, world_position: Vector2<i32>) -> Vector2<i32> {
         world_position - self.position + Vector2::cast(&(self.canvas_size / 2)).unwrap()
     }
@@ -84,7 +88,7 @@ mod tests {
     fn camera_canvas_size() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
-            ..Default::default()
+            ..Camera::default()
         };
         assert_eq!(*camera.canvas_size(), camera.canvas_size);
     }
@@ -93,7 +97,7 @@ mod tests {
     fn camera_get_world_position() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
-            ..Default::default()
+            ..Camera::default()
         };
         let canvas_position = Vector2::new(35, 35);
         assert_eq!(
@@ -106,7 +110,7 @@ mod tests {
     fn camera_get_canvas_position() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
-            ..Default::default()
+            ..Camera::default()
         };
         let world_position = Vector2::new(10, 10);
         assert_eq!(

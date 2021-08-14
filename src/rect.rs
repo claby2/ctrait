@@ -38,6 +38,7 @@ impl Rect {
     /// // rect now represents a rectangle centered at (0, 0).
     /// assert_eq!(rect.center(), Vector2::new(0, 0));
     /// ```
+    #[must_use]
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
         Self {
             position: Vector2::new(x, y),
@@ -57,6 +58,7 @@ impl Rect {
     /// // rect now represents a rectangle centered at (0, 0).
     /// assert_eq!(rect.center(), Vector2::new(0, 0));
     /// ```
+    #[must_use]
     pub fn from_center(center_x: i32, center_y: i32, width: u32, height: u32) -> Self {
         Self::new(
             center_x - (width / 2) as i32,
@@ -76,6 +78,7 @@ impl Rect {
     /// let rect = Rect::default().with_color(&Color::GRAY);
     /// assert_eq!(rect.color, Some(Color::GRAY));
     /// ```
+    #[must_use]
     pub fn with_color(mut self, color: &Color) -> Self {
         self.color = Some(*color);
         self
@@ -91,6 +94,7 @@ impl Rect {
     /// let rect = Rect::from_center(1, 2, 3, 4);
     /// assert_eq!(rect.center(), Vector2::new(1, 2));
     /// ```
+    #[must_use]
     pub fn center(&self) -> Vector2<i32> {
         self.position + Vector2::cast(&(self.size / 2)).unwrap()
     }
@@ -125,6 +129,7 @@ impl Rect {
     /// assert!(Rect::new(0, 0, 1, 0).is_empty());  // width = 1, height = 0
     /// assert!(!Rect::new(0, 0, 1, 1).is_empty()); // width = 1, height = 1
     /// ```
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.size.x == 0 || self.size.y == 0
     }
@@ -132,6 +137,7 @@ impl Rect {
     /// Returns `true` if the given rectangle intersects.
     ///
     /// Will return `false` if either of the rectangles have no area.
+    #[must_use]
     pub fn intersects(&self, other: &Rect) -> bool {
         // Special case if one of the rectangles have no area.
         if self.is_empty() || other.is_empty() {
@@ -224,7 +230,7 @@ mod tests {
     fn rect_as_canvas_rect_some() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
-            ..Default::default()
+            ..Camera::default()
         };
         let rect = Rect::new(0, 0, 10, 10);
         let canvas_rect = rect.as_canvas_rect(&camera);
@@ -235,7 +241,7 @@ mod tests {
     fn rect_as_canvas_rect_none() {
         let camera = Camera {
             canvas_size: Vector2::new(50, 50),
-            ..Default::default()
+            ..Camera::default()
         };
         let rect = Rect::new(100, 100, 10, 10);
         let canvas_rect = rect.as_canvas_rect(&camera);

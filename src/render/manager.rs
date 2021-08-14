@@ -6,6 +6,7 @@ use sdl2::{
 };
 use std::{collections::HashMap, rc::Rc};
 
+#[allow(clippy::module_name_repetitions)]
 pub struct TextureManager<'a> {
     texture_creator: &'a TextureCreator<WindowContext>,
     cache: HashMap<String, Rc<Texture<'a>>>,
