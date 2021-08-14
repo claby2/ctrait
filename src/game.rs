@@ -76,7 +76,7 @@ impl Game {
     ///
     /// # Panics
     ///
-    /// This function might panic if another user of any of the container panics.
+    /// This function panics if another user of any of the entity containers panics.
     pub fn start(&mut self, renderer: &mut Renderer) -> CtraitResult<()> {
         let sdl_context = sdl2::init()?;
         let mut event_pump = sdl_context.event_pump()?;
