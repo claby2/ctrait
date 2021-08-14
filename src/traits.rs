@@ -13,7 +13,7 @@ use sdl2::event::Event;
 /// struct UpdateExample;
 ///
 /// impl Update for UpdateExample {
-///     fn update(&mut self, delta: f64) {
+///     fn update(&mut self, delta: f32) {
 ///         // Any code here will be executed every frame.
 ///     }
 /// }
@@ -21,7 +21,7 @@ use sdl2::event::Event;
 pub trait Update: Send {
     /// Called once per game loop iteration.
     /// `delta` is the number of seconds since the last update.
-    fn update(&mut self, delta: f64);
+    fn update(&mut self, delta: f32);
 }
 
 /// A type that should update every fixed timestep.
@@ -36,7 +36,7 @@ pub trait Update: Send {
 /// struct FixedUpdateExample;
 ///
 /// impl FixedUpdate for FixedUpdateExample {
-///     fn fixed_update(&mut self, delta: f64) {
+///     fn fixed_update(&mut self, delta: f32) {
 ///         // Any code here will be executed at a fixed rate.
 ///     }
 /// }
@@ -45,7 +45,7 @@ pub trait FixedUpdate: Send {
     /// `delta` is the number of seconds since the last update.
     /// It should be approximately equal to the default timestep
     /// [`Game::DEFAULT_TIMESTEP`](crate::game::Game::DEFAULT_TIMESTEP).
-    fn fixed_update(&mut self, delta: f64);
+    fn fixed_update(&mut self, delta: f32);
 }
 
 /// A type that is responsive to user events.

@@ -78,16 +78,16 @@ impl Renderer {
     /// use ctrait::{camera::Camera, entity, entity::Entity, render::Renderer, math::Vector2};
     ///
     /// fn increment_camera_x(camera: Entity<Camera>) {
-    ///     camera.lock().unwrap().position.x += 1;
+    ///     camera.lock().unwrap().position.x += 1.0;
     /// }
     ///
-    /// let camera = entity!(Camera::new(Vector2::new(0, 0)));
+    /// let camera = entity!(Camera::new(Vector2::new(0.0, 0.0)));
     ///
     /// // camera can now be cloned and passed multiple times.
     /// increment_camera_x(Entity::clone(&camera));
     /// increment_camera_x(Entity::clone(&camera));
     ///
-    /// assert_eq!(camera.lock().unwrap().position.x, 2);
+    /// assert_eq!(camera.lock().unwrap().position.x, 2.0);
     ///
     /// // There is no need to clone camera here because it is not being used after this point.
     /// let renderer = Renderer::default()

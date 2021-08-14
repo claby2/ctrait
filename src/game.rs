@@ -101,7 +101,7 @@ impl Game {
                         .unwrap()
                         .lock()
                         .unwrap()
-                        .fixed_update(fixed_update_instant.elapsed().as_secs_f64());
+                        .fixed_update(fixed_update_instant.elapsed().as_secs_f32());
                 });
             fixed_update_instant = Instant::now();
         });
@@ -120,7 +120,7 @@ impl Game {
                         .unwrap()
                         .lock()
                         .unwrap()
-                        .update(standard_instant.elapsed().as_secs_f64());
+                        .update(standard_instant.elapsed().as_secs_f32());
                 });
             standard_instant = Instant::now();
             if renderer.has_quit() {

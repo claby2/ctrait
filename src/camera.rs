@@ -7,13 +7,13 @@ use sdl2::render::WindowCanvas;
 #[derive(Debug, Copy, Clone)]
 pub struct Camera {
     /// World position of the camera.
-    pub position: Vector2<i32>,
+    pub position: Vector2<f32>,
     pub(crate) canvas_size: Vector2<u32>,
 }
 
 impl Default for Camera {
     fn default() -> Self {
-        Self::new(Vector2::new(0, 0))
+        Self::new(Vector2::new(0.0, 0.0))
     }
 }
 
@@ -25,12 +25,12 @@ impl Camera {
     /// ```
     /// use ctrait::{camera::Camera, math::Vector2};
     ///
-    /// let camera = Camera::new(Vector2::new(5, 10));
+    /// let camera = Camera::new(Vector2::new(5.0, 10.0));
     /// // camera is located at world position (5, 10).
-    /// assert_eq!(camera.position, Vector2::new(5, 10));
+    /// assert_eq!(camera.position, Vector2::new(5.0, 10.0));
     /// ```
     #[must_use]
-    pub fn new(position: Vector2<i32>) -> Self {
+    pub fn new(position: Vector2<f32>) -> Self {
         Self {
             position,
             canvas_size: Vector2::new(0, 0),
@@ -40,6 +40,10 @@ impl Camera {
     /// Retrieves the size of the canvas.
     ///
     /// The value is internally updated once per game loop iteration.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the width or height of the canvas exceeds [`f32::MAX`].
     ///
     /// # Examples
     ///
@@ -51,20 +55,20 @@ impl Camera {
     /// println!("width: {}, height: {}", canvas_size.x, canvas_size.y);
     /// ```
     #[must_use]
-    pub fn canvas_size(&self) -> &Vector2<u32> {
-        &self.canvas_size
+    pub fn canvas_size(&self) -> Vector2<f32> {
+        self.canvas_size.cast().unwrap()
     }
 
     /// Converts the given canvas position to its equivalent world position.
     #[must_use]
-    pub fn get_world_position(&self, canvas_position: Vector2<i32>) -> Vector2<i32> {
-        canvas_position + self.position - Vector2::cast(&(self.canvas_size / 2)).unwrap()
+    pub fn get_world_position(&self, canvas_position: Vector2<f32>) -> Vector2<f32> {
+        canvas_position + self.position - self.canvas_size() / 2.0
     }
 
     /// Converts the given world position to its equivalent canvas position.
     #[must_use]
-    pub fn get_canvas_position(&self, world_position: Vector2<i32>) -> Vector2<i32> {
-        world_position - self.position + Vector2::cast(&(self.canvas_size / 2)).unwrap()
+    pub fn get_canvas_position(&self, world_position: Vector2<f32>) -> Vector2<f32> {
+        world_position - self.position + self.canvas_size() / 2.0
     }
 
     pub(crate) fn update(&mut self, canvas: &WindowCanvas) {
@@ -79,8 +83,8 @@ mod tests {
 
     #[test]
     fn camera_new() {
-        let camera = Camera::new(Vector2::new(2, 3));
-        assert_eq!(camera.position, Vector2::new(2, 3));
+        let camera = Camera::new(Vector2::new(2.0, 3.0));
+        assert_eq!(camera.position, Vector2::new(2.0, 3.0));
         assert_eq!(camera.canvas_size, Vector2::new(0, 0));
     }
 
@@ -90,7 +94,7 @@ mod tests {
             canvas_size: Vector2::new(50, 50),
             ..Camera::default()
         };
-        assert_eq!(*camera.canvas_size(), camera.canvas_size);
+        assert_eq!(camera.canvas_size(), camera.canvas_size.cast().unwrap());
     }
 
     #[test]
@@ -99,10 +103,10 @@ mod tests {
             canvas_size: Vector2::new(50, 50),
             ..Camera::default()
         };
-        let canvas_position = Vector2::new(35, 35);
+        let canvas_position = Vector2::new(35.0, 35.0);
         assert_eq!(
             camera.get_world_position(canvas_position),
-            Vector2::new(10, 10)
+            Vector2::new(10.0, 10.0)
         );
     }
 
@@ -112,10 +116,10 @@ mod tests {
             canvas_size: Vector2::new(50, 50),
             ..Camera::default()
         };
-        let world_position = Vector2::new(10, 10);
+        let world_position = Vector2::new(10.0, 10.0);
         assert_eq!(
             camera.get_canvas_position(world_position),
-            Vector2::new(35, 35)
+            Vector2::new(35.0, 35.0)
         );
     }
 }

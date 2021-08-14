@@ -25,11 +25,11 @@ struct Paddle {
 }
 
 impl Paddle {
-    const SPEED: f64 = 600.0;
+    const SPEED: f32 = 600.0;
 
-    fn new(x: i32, up_key: Keycode, down_key: Keycode) -> Self {
+    fn new(x: f32, up_key: Keycode, down_key: Keycode) -> Self {
         Self {
-            rect: Rect::from_center(x, 0, 20, 80).with_color(&Color::WHITE),
+            rect: Rect::from_center(x, 0.0, 20.0, 80.0).with_color(&Color::WHITE),
             movement: Movement::default(),
             up_key,
             down_key,
@@ -38,12 +38,12 @@ impl Paddle {
 }
 
 impl FixedUpdate for Paddle {
-    fn fixed_update(&mut self, delta: f64) {
+    fn fixed_update(&mut self, delta: f32) {
         if self.movement.up {
-            self.rect.position.y -= (Self::SPEED * delta) as i32;
+            self.rect.position.y -= Self::SPEED * delta;
         }
         if self.movement.down {
-            self.rect.position.y += (Self::SPEED * delta) as i32;
+            self.rect.position.y += Self::SPEED * delta;
         }
     }
 }
@@ -85,17 +85,17 @@ impl Renderable for Paddle {
 #[derive(Debug)]
 struct Ball {
     rect: Rect,
-    velocity: Vector2<f64>,
+    velocity: Vector2<f32>,
     camera: Entity<Camera>,
     paddle1: Entity<Paddle>,
     paddle2: Entity<Paddle>,
 }
 
 impl Ball {
-    const SPEED: f64 = 800.0;
+    const SPEED: f32 = 800.0;
     fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
         Self {
-            rect: Rect::from_center(0, 0, 10, 10).with_color(&Color::WHITE),
+            rect: Rect::from_center(0.0, 0.0, 10.0, 10.0).with_color(&Color::WHITE),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
             paddle1,
@@ -104,7 +104,7 @@ impl Ball {
     }
 
     // Calculates the y velocity depending on the paddle's movement.
-    fn calculate_y_velocity(paddle_movement: &Movement) -> f64 {
+    fn calculate_y_velocity(paddle_movement: &Movement) -> f32 {
         if paddle_movement.up {
             -Self::SPEED
         } else if paddle_movement.down {
@@ -116,19 +116,18 @@ impl Ball {
 }
 
 impl Update for Ball {
-    fn update(&mut self, _: f64) {
+    fn update(&mut self, _: f32) {
         // Here, Update is implemented for Ball to check for collisions. Update is used rather than
         // FixedUpdate because none of the following code is time-dependent.
         let camera = self.camera.lock().unwrap();
         let canvas_position = camera.get_canvas_position(self.rect.position);
-        if canvas_position.x < 0
-            || canvas_position.x as u32 + self.rect.size.x >= camera.canvas_size().x
+        if canvas_position.x < 0.0 || canvas_position.x + self.rect.size.x >= camera.canvas_size().x
         {
             // The ball has reached the left or right bounds of the canvas. Reset its position.
-            self.rect.center_on(0, 0);
+            self.rect.center_on(0.0, 0.0);
             self.velocity.y = 0.0;
-        } else if canvas_position.y < 0
-            || canvas_position.y as u32 + self.rect.size.y >= camera.canvas_size().y
+        } else if canvas_position.y < 0.0
+            || canvas_position.y + self.rect.size.y >= camera.canvas_size().y
         {
             // The ball has reached the top or bottom bounds of the canvas. Invert its y velocity.
             self.velocity.y *= -1.0;
@@ -148,8 +147,8 @@ impl Update for Ball {
 }
 
 impl FixedUpdate for Ball {
-    fn fixed_update(&mut self, delta: f64) {
-        self.rect.position += Vector2::cast(&(self.velocity * delta)).unwrap();
+    fn fixed_update(&mut self, delta: f32) {
+        self.rect.position += self.velocity * delta;
     }
 }
 
@@ -163,8 +162,8 @@ fn main() {
     // Define the camera as an entity so it can be referred to by Ball.
     let camera = entity!(Camera::default());
     let mut renderer = Renderer::default().with_camera_entity(Entity::clone(&camera));
-    let paddle1 = entity!(Paddle::new(-400, Keycode::W, Keycode::S));
-    let paddle2 = entity!(Paddle::new(400, Keycode::Up, Keycode::Down));
+    let paddle1 = entity!(Paddle::new(-400.0, Keycode::W, Keycode::S));
+    let paddle2 = entity!(Paddle::new(400.0, Keycode::Up, Keycode::Down));
     // The ball needs to know the positions of the paddles. Thus, references to the paddles are
     // passed to the ball. Unlike the paddles, the camera is consumed because it is not referred to
     // after this point.
