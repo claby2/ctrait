@@ -16,18 +16,18 @@ struct Block {
 }
 
 impl Block {
-    const FALL_SPEED: f64 = 600.0;
+    const FALL_SPEED: f32 = 600.0;
 
-    fn new(position: &Vector2<i32>) -> Self {
+    fn new(position: Vector2<f32>) -> Self {
         Self {
-            rect: Rect::from_center(position.x, position.y, 50, 50).with_color(&Color::GRAY),
+            rect: Rect::from_center(position.x, position.y, 50.0, 50.0).with_color(&Color::GRAY),
         }
     }
 }
 
 impl FixedUpdate for Block {
-    fn fixed_update(&mut self, delta: f64) {
-        self.rect.position.y += (Self::FALL_SPEED * delta) as i32;
+    fn fixed_update(&mut self, delta: f32) {
+        self.rect.position.y += Self::FALL_SPEED * delta;
     }
 }
 
@@ -54,14 +54,14 @@ struct Spawner {
 }
 
 impl Spawner {
-    const SPEED: f64 = 500.0;
+    const SPEED: f32 = 500.0;
 
     fn new(
         renderable_entities: EntityContainer<dyn Renderable>,
         fixed_update_entities: EntityContainer<dyn FixedUpdate>,
     ) -> Self {
         Self {
-            rect: Rect::from_center(0, -200, 100, 20).with_color(&Color::GREEN),
+            rect: Rect::from_center(0.0, -200.0, 100.0, 20.0).with_color(&Color::GREEN),
             movement: Movement::default(),
             // Clone the entity containers.
             renderable_entities,
@@ -72,11 +72,11 @@ impl Spawner {
 }
 
 impl Update for Spawner {
-    fn update(&mut self, _: f64) {
+    fn update(&mut self, _: f32) {
         // The internal implementation of EntityContainer means that if an entity is dropped, its
         // references in the corresponding container(s) will also be removed.
         self.blocks
-            .retain(|block| block.lock().unwrap().rect.position.y < 100);
+            .retain(|block| block.lock().unwrap().rect.position.y < 100.0);
     }
 }
 
@@ -93,7 +93,7 @@ impl Interactive for Spawner {
                     self.movement.right = true;
                 } else if *keycode == Keycode::Space {
                     // Instantiate a block.
-                    let block = entity!(Block::new(&self.rect.center()));
+                    let block = entity!(Block::new(self.rect.center()));
                     self.renderable_entities
                         .add_entities(&entities!(Renderable; block));
                     self.fixed_update_entities
@@ -118,12 +118,12 @@ impl Interactive for Spawner {
 }
 
 impl FixedUpdate for Spawner {
-    fn fixed_update(&mut self, delta: f64) {
+    fn fixed_update(&mut self, delta: f32) {
         if self.movement.left {
-            self.rect.position.x -= (Self::SPEED * delta) as i32;
+            self.rect.position.x -= Self::SPEED * delta;
         }
         if self.movement.right {
-            self.rect.position.x += (Self::SPEED * delta) as i32;
+            self.rect.position.x += Self::SPEED * delta;
         }
     }
 }

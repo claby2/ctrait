@@ -13,16 +13,16 @@ use ctrait::{
 #[derive(Debug)]
 struct Cursor {
     rect: Rect,
-    cursor_position: Vector2<i32>,
+    cursor_position: Vector2<f32>,
     camera: Entity<Camera>,
 }
 
 impl Cursor {
-    const SIZE: u32 = 100;
+    const SIZE: f32 = 100.0;
     fn new(camera: Entity<Camera>) -> Self {
         Self {
-            rect: Rect::from_center(0, 0, Self::SIZE, Self::SIZE).with_color(&Color::WHITE),
-            cursor_position: Vector2::new(0, 0),
+            rect: Rect::from_center(0.0, 0.0, Self::SIZE, Self::SIZE).with_color(&Color::WHITE),
+            cursor_position: Vector2::new(0.0, 0.0),
             camera,
         }
     }
@@ -32,13 +32,13 @@ impl Interactive for Cursor {
     fn on_event(&mut self, event: &Event) {
         if let Event::MouseMotion { x, y, .. } = event {
             // Get cursor position relative to canvas.
-            self.cursor_position = Vector2::new(*x, *y);
+            self.cursor_position = Vector2::new(*x, *y).cast().unwrap();
         }
     }
 }
 
 impl Update for Cursor {
-    fn update(&mut self, _: f64) {
+    fn update(&mut self, _: f32) {
         // The cursor position is relative to the canvas and not the world.
         // It must be converted first.
         let cursor_world_position = self
@@ -48,8 +48,8 @@ impl Update for Cursor {
             .get_world_position(self.cursor_position);
         // Set the rect's position to the cursor's world position.
         self.rect.position = Vector2::new(
-            cursor_world_position.x - (Self::SIZE / 2) as i32,
-            cursor_world_position.y - (Self::SIZE / 2) as i32,
+            cursor_world_position.x - (Self::SIZE / 2.0),
+            cursor_world_position.y - (Self::SIZE / 2.0),
         );
     }
 }
@@ -70,7 +70,7 @@ struct Detector {
 impl Detector {
     fn new(cursor: Entity<Cursor>) -> Self {
         Self {
-            rect: Rect::from_center(0, 0, 300, 300),
+            rect: Rect::from_center(0.0, 0.0, 300.0, 300.0),
             colliding: false,
             cursor,
         }
@@ -78,7 +78,7 @@ impl Detector {
 }
 
 impl Update for Detector {
-    fn update(&mut self, _: f64) {
+    fn update(&mut self, _: f32) {
         self.colliding = self.cursor.lock().unwrap().rect.intersects(&self.rect);
         // Change the color of the rectangle depending on if it is colliding or not.
         self.rect.color = Some(if self.colliding {

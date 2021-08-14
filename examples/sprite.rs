@@ -15,13 +15,13 @@ struct Image {
 }
 
 impl Image {
-    const SPRITE_SIZE: u32 = 256;
+    const SPRITE_SIZE: f32 = 256.0;
 
     fn new(path: &str) -> Self {
         Self {
             sprite: Sprite::new(
                 path,
-                &Rect::from_center(0, 0, Self::SPRITE_SIZE, Self::SPRITE_SIZE),
+                &Rect::from_center(0.0, 0.0, Self::SPRITE_SIZE, Self::SPRITE_SIZE),
             ),
         }
     }

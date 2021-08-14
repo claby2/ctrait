@@ -4,7 +4,7 @@ use crate::{camera::Camera, rect::Rect, render::RenderContext, traits::Renderabl
 use std::path::PathBuf;
 
 /// A sprite which holds a path to a texture and a [`Rect`].
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Sprite {
     /// Path to the texture.
     pub path: PathBuf,
@@ -23,11 +23,11 @@ impl Sprite {
     /// use ctrait::{rect::Rect, sprite::Sprite};
     /// use std::path::PathBuf;
     ///
-    /// let sprite = Sprite::new("path/to/image.png", &Rect::from_center(0, 0, 10, 10));
+    /// let sprite = Sprite::new("path/to/image.png", &Rect::from_center(0.0, 0.0, 10.0, 10.0));
     ///
     /// // To ensure cross-platform compatibility:
     /// let sprite_path: PathBuf = ["sprites", "sprite.jpg"].iter().collect();
-    /// let another_sprite = Sprite::new(&sprite_path, &Rect::from_center(20, 20, 5, 5));
+    /// let another_sprite = Sprite::new(&sprite_path, &Rect::from_center(20.0, 20.0, 5.0, 5.0));
     /// ```
     pub fn new<P: Into<PathBuf>>(path: P, rect: &Rect) -> Self {
         Self {
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn sprite_new() {
         let sprite_path: PathBuf = PathBuf::from("image.png");
-        let sprite = Sprite::new(&sprite_path, &Rect::from_center(20, 20, 5, 5));
+        let sprite = Sprite::new(&sprite_path, &Rect::from_center(20.0, 20.0, 5.0, 5.0));
         assert_eq!(sprite.path.to_str(), Some("image.png"));
     }
 }

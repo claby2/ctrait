@@ -1,4 +1,10 @@
 #![warn(missing_docs)]
+#![allow(
+    clippy::cast_precision_loss,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap
+)]
 
 //! # ctrait
 //!
@@ -28,7 +34,7 @@
 //!     fn new() -> Self {
 //!         Self {
 //!             // Create a red rectangle with a width and height of 50 pixels.
-//!             rect: Rect::from_center(0, 0, 50, 50).with_color(&Color::RED),
+//!             rect: Rect::from_center(0.0, 0.0, 50.0, 50.0).with_color(&Color::RED),
 //!         }
 //!     }
 //! }

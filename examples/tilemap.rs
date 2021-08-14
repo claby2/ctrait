@@ -20,7 +20,7 @@ impl World {
             tilemap: Tilemap::new(
                 // The tilemap has two possible tiles: a red square or a white square.
                 &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
-                64,
+                64.0,
             )
             // The layout represents how the tiles are arranged.
             .with_layout(

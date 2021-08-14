@@ -11,6 +11,7 @@ macro_rules! set_flag {
 }
 
 /// Configuration for [`Renderer`](crate::render::Renderer).
+#[allow(clippy::module_name_repetitions, clippy::struct_excessive_bools)]
 #[derive(Debug)]
 pub struct RendererConfig {
     /// Dimensions of the window.
@@ -58,15 +59,15 @@ impl RendererConfig {
 
     /// Get the dimensions specified in the configuration. If dimensions is [`None`], returns
     /// fallback dimensions derived from [`FALLBACK_WIDTH`](Self::FALLBACK_WIDTH) and [`FALLBACK_HEIGHT`](Self::FALLBACK_HEIGHT).
+    #[must_use]
     pub fn dimensions(&self) -> (u32, u32) {
-        if let Some(dimensions) = self.dimensions {
-            dimensions
-        } else {
+        self.dimensions.map_or(
             (
                 RendererConfig::FALLBACK_WIDTH,
                 RendererConfig::FALLBACK_HEIGHT,
-            )
-        }
+            ),
+            |dimensions| dimensions,
+        )
     }
 
     fn create_window(&self, video_subsystem: &VideoSubsystem) -> CtraitResult<Window> {
@@ -132,7 +133,7 @@ mod tests {
     fn renderer_config_set_dimensions() {
         let config = RendererConfig {
             dimensions: Some((5, 10)),
-            ..Default::default()
+            ..RendererConfig::default()
         };
         assert_eq!(config.dimensions(), (5, 10));
     }
@@ -141,7 +142,7 @@ mod tests {
     fn renderer_config_fallback_dimensions() {
         let config = RendererConfig {
             dimensions: None,
-            ..Default::default()
+            ..RendererConfig::default()
         };
         assert_eq!(
             config.dimensions(),

@@ -58,6 +58,7 @@ macro_rules! entities {
 }
 
 /// Structure containing [`Weak`] references to entities.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug)]
 pub struct EntityContainer<T: ?Sized>(Arc<Mutex<Vec<WeakEntity<T>>>>);
 
@@ -83,6 +84,7 @@ impl<T: ?Sized> EntityContainer<T> {
     ///
     /// let entity_container = EntityContainer::<dyn Renderable>::new();
     /// ```
+    #[must_use]
     pub fn new() -> Self {
         Self(Arc::new(Mutex::new(Vec::new())))
     }
@@ -125,6 +127,10 @@ impl<T: ?Sized> EntityContainer<T> {
     }
 
     /// Clears the entity container, removing all entities.
+    ///
+    /// # Panics
+    ///
+    /// This function might panic if another user of the container panics.
     pub fn clear(&mut self) {
         self.0.lock().unwrap().clear();
     }
@@ -164,6 +170,7 @@ mod tests {
     #[test]
     fn entity_access() {
         impl Test {
+            #[allow(clippy::unused_self)]
             fn it_works(&self) -> bool {
                 true
             }
