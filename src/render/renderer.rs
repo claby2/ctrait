@@ -1,6 +1,6 @@
 use crate::{
     camera::Camera,
-    entity::{Entity, EntityContainer},
+    entity::{Entities, Entity},
     render::{RenderContext, RendererConfig},
     traits::{Interactive, Renderable},
 };
@@ -108,7 +108,7 @@ impl Renderer {
     pub(crate) fn process_event(
         &mut self,
         event_pump: &mut EventPump,
-        entities: &mut EntityContainer<dyn Interactive>,
+        entities: &mut Entities<dyn Interactive>,
     ) {
         let entities = entities.access();
         for event in event_pump.poll_iter() {
@@ -128,7 +128,7 @@ impl Renderer {
     pub(crate) fn render(
         &mut self,
         context: &mut RenderContext,
-        entities: &mut EntityContainer<dyn Renderable>,
+        entities: &mut Entities<dyn Renderable>,
     ) {
         if let Some(camera) = &mut self.camera {
             let mut camera = camera.lock().unwrap();

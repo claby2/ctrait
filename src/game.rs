@@ -1,7 +1,7 @@
 //! Main storage for entity containers.
 
 use crate::{
-    entity::EntityContainer,
+    entity::Entities,
     error::CtraitResult,
     render::{manager::TextureManager, RenderContext, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
@@ -12,18 +12,17 @@ use timer::Timer;
 
 /// Game manager.
 ///
-/// The game manager holds multiple [`EntityContainer`]s, each representing
-/// [`Weak`](std::sync::Weak) pointers to
-/// entities.
+/// The game manager holds multiple [`Entities`], each representing
+/// [`Weak`](std::sync::Weak) pointers to entities.
 pub struct Game {
     /// Entities implementing [`Update`] trait.
-    pub update_entities: EntityContainer<dyn Update>,
+    pub update_entities: Entities<dyn Update>,
     /// Entities implementing [`FixedUpdate`] trait.
-    pub fixed_update_entities: EntityContainer<dyn FixedUpdate>,
+    pub fixed_update_entities: Entities<dyn FixedUpdate>,
     /// Entities implementing [`Renderable`] trait.
-    pub renderable_entities: EntityContainer<dyn Renderable>,
+    pub renderable_entities: Entities<dyn Renderable>,
     /// Entities implementing [`Interactive`] trait.
-    pub interactive_entities: EntityContainer<dyn Interactive>,
+    pub interactive_entities: Entities<dyn Interactive>,
     timestep: i64,
 }
 
@@ -49,10 +48,10 @@ impl Game {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            update_entities: EntityContainer::default(),
-            fixed_update_entities: EntityContainer::default(),
-            renderable_entities: EntityContainer::default(),
-            interactive_entities: EntityContainer::default(),
+            update_entities: Entities::default(),
+            fixed_update_entities: Entities::default(),
+            renderable_entities: Entities::default(),
+            interactive_entities: Entities::default(),
             timestep: Self::DEFAULT_TIMESTEP,
         }
     }
@@ -88,7 +87,7 @@ impl Game {
         // Start fixed update processs.
         let timer = Timer::new();
         let mut fixed_update_instant = Instant::now();
-        let fixed_update_entities = EntityContainer::clone(&self.fixed_update_entities);
+        let fixed_update_entities = Entities::clone(&self.fixed_update_entities);
         let _guard = timer.schedule_repeating(Duration::milliseconds(self.timestep), move || {
             fixed_update_entities
                 .access()

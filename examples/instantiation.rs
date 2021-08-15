@@ -1,7 +1,7 @@
 use ctrait::{
     camera::Camera,
     entities, entity,
-    entity::{Entity, EntityContainer},
+    entity::{Entities, Entity},
     game::Game,
     math::Vector2,
     rect::Rect,
@@ -10,6 +10,7 @@ use ctrait::{
     Color, Event, Keycode,
 };
 
+// Rect that will be instantiated by the spawner.
 #[derive(Debug)]
 struct Block {
     rect: Rect,
@@ -27,6 +28,7 @@ impl Block {
 
 impl FixedUpdate for Block {
     fn fixed_update(&mut self, delta: f32) {
+        // Increase the y position to make the block fall.
         self.rect.position.y += Self::FALL_SPEED * delta;
     }
 }
@@ -46,8 +48,8 @@ struct Movement {
 struct Spawner {
     rect: Rect,
     movement: Movement,
-    renderable_entities: EntityContainer<dyn Renderable>,
-    fixed_update_entities: EntityContainer<dyn FixedUpdate>,
+    renderable_entities: Entities<dyn Renderable>,
+    fixed_update_entities: Entities<dyn FixedUpdate>,
     // Vector owning all instantiated blocks. This makes it easy to manage the blocks after they
     // have been instantiated.
     blocks: Vec<Entity<Block>>,
@@ -57,13 +59,12 @@ impl Spawner {
     const SPEED: f32 = 500.0;
 
     fn new(
-        renderable_entities: EntityContainer<dyn Renderable>,
-        fixed_update_entities: EntityContainer<dyn FixedUpdate>,
+        renderable_entities: Entities<dyn Renderable>,
+        fixed_update_entities: Entities<dyn FixedUpdate>,
     ) -> Self {
         Self {
             rect: Rect::from_center(0.0, -200.0, 100.0, 20.0).with_color(&Color::GREEN),
             movement: Movement::default(),
-            // Clone the entity containers.
             renderable_entities,
             fixed_update_entities,
             blocks: Vec::new(),
@@ -73,7 +74,7 @@ impl Spawner {
 
 impl Update for Spawner {
     fn update(&mut self, _: f32) {
-        // The internal implementation of EntityContainer means that if an entity is dropped, its
+        // The internal implementation of entity container means that if an entity is dropped, its
         // references in the corresponding container(s) will also be removed.
         self.blocks
             .retain(|block| block.lock().unwrap().rect.position.y < 100.0);
@@ -140,8 +141,8 @@ fn main() {
     // References to entity containers are passed to spawner to allow it to instantiate entities
     // during run-time.
     let spawner = entity!(Spawner::new(
-        EntityContainer::clone(&game.renderable_entities),
-        EntityContainer::clone(&game.fixed_update_entities)
+        Entities::clone(&game.renderable_entities),
+        Entities::clone(&game.fixed_update_entities)
     ));
     game.update_entities
         .add_entities(&entities!(Update; spawner));

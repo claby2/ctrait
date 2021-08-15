@@ -29,7 +29,7 @@ macro_rules! entity {
 ///
 /// The first argument should be a trait that all following entities implement.
 /// The macro is mainly useful when passing entities to [`Game`](crate::game::Game) as a slice with
-/// [`EntityContainer::add_entities`].
+/// [`Entities::add_entities`].
 ///
 /// # Examples
 ///
@@ -57,32 +57,33 @@ macro_rules! entities {
     };
 }
 
-/// Structure containing [`Weak`] references to entities.
-#[allow(clippy::module_name_repetitions)]
+/// Entity container holding a [`Vec`] of [`Weak`] references to entities.
+///
+/// This structure is thread-safe.
 #[derive(Debug)]
-pub struct EntityContainer<T: ?Sized>(Arc<Mutex<Vec<WeakEntity<T>>>>);
+pub struct Entities<T: ?Sized>(Arc<Mutex<Vec<WeakEntity<T>>>>);
 
-impl<T: ?Sized> Default for EntityContainer<T> {
+impl<T: ?Sized> Default for Entities<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: ?Sized> Clone for EntityContainer<T> {
+impl<T: ?Sized> Clone for Entities<T> {
     fn clone(&self) -> Self {
         Self(Arc::clone(&self.0))
     }
 }
 
-impl<T: ?Sized> EntityContainer<T> {
+impl<T: ?Sized> Entities<T> {
     /// Constructs a new entity container.
     ///
     /// # Examples
     ///
     /// ```
-    /// use ctrait::{entity::EntityContainer, traits::Renderable};
+    /// use ctrait::{entity::Entities, traits::Renderable};
     ///
-    /// let entity_container = EntityContainer::<dyn Renderable>::new();
+    /// let entities = Entities::<dyn Renderable>::new();
     /// ```
     #[must_use]
     pub fn new() -> Self {
@@ -156,16 +157,10 @@ impl<T: ?Sized> EntityContainer<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Arc, EntityContainer};
+    use super::{Arc, Entities};
 
     // Test struct to create test entity.
     struct Test;
-
-    #[test]
-    fn entity_container_new() {
-        let entity_container = EntityContainer::<Test>::new();
-        assert!(entity_container.0.lock().unwrap().is_empty());
-    }
 
     #[test]
     fn entity_access() {
@@ -180,59 +175,65 @@ mod tests {
     }
 
     #[test]
-    fn entity_container_clone() {
-        let container = EntityContainer::<Test>::default();
-        let _container_clone = EntityContainer::clone(&container);
-        assert_eq!(Arc::strong_count(&container.0), 2);
+    fn entities_new() {
+        let entities = Entities::<Test>::new();
+        assert!(entities.0.lock().unwrap().is_empty());
     }
 
     #[test]
-    fn entity_container_push() {
+    fn entities_clone() {
+        let entities = Entities::<Test>::default();
+        let _entities_clone = Entities::clone(&entities);
+        assert_eq!(Arc::strong_count(&entities.0), 2);
+    }
+
+    #[test]
+    fn entities_push() {
         let entity = entity!(Test {});
-        let mut container = EntityContainer::default();
-        container.push(&entity);
-        assert_eq!(container.0.lock().unwrap().len(), 1);
+        let mut entities = Entities::default();
+        entities.push(&entity);
+        assert_eq!(entities.0.lock().unwrap().len(), 1);
     }
 
     #[test]
-    fn entity_container_add_entities() {
+    fn entities_add_entities() {
         let a = entity!(Test {});
         let b = entity!(Test {});
-        let mut container = EntityContainer::default();
-        container.add_entities(&[a, b]);
-        assert_eq!(container.0.lock().unwrap().len(), 2);
+        let mut entities = Entities::default();
+        entities.add_entities(&[a, b]);
+        assert_eq!(entities.0.lock().unwrap().len(), 2);
     }
 
     #[test]
-    fn entity_container_clear() {
+    fn entities_clear() {
         let entity = entity!(Test {});
-        let mut container = EntityContainer::default();
-        container.0.lock().unwrap().push(Arc::downgrade(&entity));
-        container.clear();
-        assert!(container.0.lock().unwrap().is_empty());
+        let mut entities = Entities::default();
+        entities.0.lock().unwrap().push(Arc::downgrade(&entity));
+        entities.clear();
+        assert!(entities.0.lock().unwrap().is_empty());
     }
 
     #[test]
-    fn entity_container_prune() {
+    fn entities_prune() {
         let a = entity!(Test {});
         let b = entity!(Test {});
         let mut entities = vec![Arc::downgrade(&a), Arc::downgrade(&b)];
         drop(a);
-        EntityContainer::prune(&mut entities);
+        Entities::prune(&mut entities);
         assert_eq!(entities.len(), 1);
         drop(b);
-        EntityContainer::prune(&mut entities);
+        Entities::prune(&mut entities);
         assert!(entities.is_empty());
     }
 
     #[test]
-    fn entity_container_access() {
+    fn entities_access() {
         let a = entity!(Test {});
         let b = entity!(Test {});
-        let container = EntityContainer::default();
+        let entities = Entities::default();
         // Intentional avoidance of EntityContainer::add_entities. This function is tested
         // elsewhere.
-        container
+        entities
             .0
             .lock()
             .unwrap()
@@ -240,10 +241,10 @@ mod tests {
         // Drop a. The Weak entity pointing to A in the container should be removed upon access
         // method call.
         drop(a);
-        container.access();
-        assert_eq!(container.0.lock().unwrap().len(), 1);
+        entities.access();
+        assert_eq!(entities.0.lock().unwrap().len(), 1);
         drop(b);
-        container.access();
-        assert!(container.0.lock().unwrap().is_empty());
+        entities.access();
+        assert!(entities.0.lock().unwrap().is_empty());
     }
 }
