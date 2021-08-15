@@ -21,7 +21,7 @@ impl Block {
 
     fn new(position: Vector2<f32>) -> Self {
         Self {
-            rect: Rect::from_center(position.x, position.y, 50.0, 50.0).with_color(&Color::GRAY),
+            rect: Rect::from_center(position.x, position.y, 50.0, 50.0).with_color(Color::GRAY),
         }
     }
 }
@@ -63,7 +63,7 @@ impl Spawner {
         fixed_update_entities: Entities<dyn FixedUpdate>,
     ) -> Self {
         Self {
-            rect: Rect::from_center(0.0, -200.0, 100.0, 20.0).with_color(&Color::GREEN),
+            rect: Rect::from_center(0.0, -200.0, 100.0, 20.0).with_color(Color::GREEN),
             movement: Movement::default(),
             renderable_entities,
             fixed_update_entities,

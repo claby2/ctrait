@@ -156,11 +156,11 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// use ctrait::{math::Vector2, tile::Tilemap};
     ///
     /// let tilemap = Tilemap::<4, 4>::new(&[], 8.0)
-    ///     .with_position(&Vector2::new(5.0, 10.0));
+    ///     .with_position(Vector2::new(5.0, 10.0));
     /// ```
     #[must_use]
-    pub fn with_position(mut self, position: &Vector2<f32>) -> Self {
-        self.position = *position;
+    pub fn with_position(mut self, position: Vector2<f32>) -> Self {
+        self.position = position;
         self
     }
 
@@ -216,12 +216,12 @@ impl<const ROWS: usize, const COLUMNS: usize> Renderable for Tilemap<ROWS, COLUM
                         match tile {
                             Tile::Sprite(path) => {
                                 // Render sprite.
-                                let sprite = Sprite::new(path, &rect);
+                                let sprite = Sprite::new(path, rect);
                                 sprite.render(camera, context);
                             }
                             Tile::Color(color) => {
                                 // Render rect with specified color.
-                                let rect = rect.with_color(color);
+                                let rect = rect.with_color(*color);
                                 rect.render(camera, context);
                             }
                         }
@@ -296,7 +296,7 @@ mod tests {
 
     #[test]
     fn tilemap_with_position() {
-        let tilemap = Tilemap::<1, 1>::new(&[], 0.0).with_position(&Vector2::new(5.0, 3.0));
+        let tilemap = Tilemap::<1, 1>::new(&[], 0.0).with_position(Vector2::new(5.0, 3.0));
         assert_eq!(tilemap.position, Vector2::new(5.0, 3.0));
     }
 

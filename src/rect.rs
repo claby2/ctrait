@@ -75,12 +75,12 @@ impl Rect {
     /// ```
     /// use ctrait::{rect::Rect, Color};
     ///
-    /// let rect = Rect::default().with_color(&Color::GRAY);
+    /// let rect = Rect::default().with_color(Color::GRAY);
     /// assert_eq!(rect.color, Some(Color::GRAY));
     /// ```
     #[must_use]
-    pub fn with_color(mut self, color: &Color) -> Self {
-        self.color = Some(*color);
+    pub fn with_color(mut self, color: Color) -> Self {
+        self.color = Some(color);
         self
     }
 
@@ -211,7 +211,7 @@ mod tests {
 
     #[test]
     fn rect_with_color() {
-        let rect = Rect::new(0.0, 0.0, 10.0, 10.0).with_color(&Color::RED);
+        let rect = Rect::new(0.0, 0.0, 10.0, 10.0).with_color(Color::RED);
         assert_eq!(rect.color, Some(Color::RED));
     }
 

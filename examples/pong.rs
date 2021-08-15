@@ -29,7 +29,7 @@ impl Paddle {
 
     fn new(x: f32, up_key: Keycode, down_key: Keycode) -> Self {
         Self {
-            rect: Rect::from_center(x, 0.0, 20.0, 80.0).with_color(&Color::WHITE),
+            rect: Rect::from_center(x, 0.0, 20.0, 80.0).with_color(Color::WHITE),
             movement: Movement::default(),
             up_key,
             down_key,
@@ -95,7 +95,7 @@ impl Ball {
     const SPEED: f32 = 800.0;
     fn new(camera: Entity<Camera>, paddle1: Entity<Paddle>, paddle2: Entity<Paddle>) -> Self {
         Self {
-            rect: Rect::from_center(0.0, 0.0, 10.0, 10.0).with_color(&Color::WHITE),
+            rect: Rect::from_center(0.0, 0.0, 10.0, 10.0).with_color(Color::WHITE),
             velocity: Vector2::new(-Self::SPEED, 0.0),
             camera,
             paddle1,

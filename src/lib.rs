@@ -34,7 +34,7 @@
 //!     fn new() -> Self {
 //!         Self {
 //!             // Create a red rectangle with a width and height of 50 pixels.
-//!             rect: Rect::from_center(0.0, 0.0, 50.0, 50.0).with_color(&Color::RED),
+//!             rect: Rect::from_center(0.0, 0.0, 50.0, 50.0).with_color(Color::RED),
 //!         }
 //!     }
 //! }

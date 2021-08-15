@@ -21,7 +21,7 @@ impl Image {
         Self {
             sprite: Sprite::new(
                 path,
-                &Rect::from_center(0.0, 0.0, Self::SPRITE_SIZE, Self::SPRITE_SIZE),
+                Rect::from_center(0.0, 0.0, Self::SPRITE_SIZE, Self::SPRITE_SIZE),
             ),
         }
     }

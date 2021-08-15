@@ -23,16 +23,16 @@ impl Sprite {
     /// use ctrait::{rect::Rect, sprite::Sprite};
     /// use std::path::PathBuf;
     ///
-    /// let sprite = Sprite::new("path/to/image.png", &Rect::from_center(0.0, 0.0, 10.0, 10.0));
+    /// let sprite = Sprite::new("path/to/image.png", Rect::from_center(0.0, 0.0, 10.0, 10.0));
     ///
     /// // To ensure cross-platform compatibility:
     /// let sprite_path: PathBuf = ["sprites", "sprite.jpg"].iter().collect();
-    /// let another_sprite = Sprite::new(&sprite_path, &Rect::from_center(20.0, 20.0, 5.0, 5.0));
+    /// let another_sprite = Sprite::new(&sprite_path, Rect::from_center(20.0, 20.0, 5.0, 5.0));
     /// ```
-    pub fn new<P: Into<PathBuf>>(path: P, rect: &Rect) -> Self {
+    pub fn new<P: Into<PathBuf>>(path: P, rect: Rect) -> Self {
         Self {
             path: path.into(),
-            rect: *rect,
+            rect,
         }
     }
 }
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn sprite_new() {
         let sprite_path: PathBuf = PathBuf::from("image.png");
-        let sprite = Sprite::new(&sprite_path, &Rect::from_center(20.0, 20.0, 5.0, 5.0));
+        let sprite = Sprite::new(&sprite_path, Rect::from_center(20.0, 20.0, 5.0, 5.0));
         assert_eq!(sprite.path.to_str(), Some("image.png"));
     }
 }

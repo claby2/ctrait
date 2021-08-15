@@ -21,7 +21,7 @@ impl Cursor {
     const SIZE: f32 = 100.0;
     fn new(camera: Entity<Camera>) -> Self {
         Self {
-            rect: Rect::from_center(0.0, 0.0, Self::SIZE, Self::SIZE).with_color(&Color::WHITE),
+            rect: Rect::from_center(0.0, 0.0, Self::SIZE, Self::SIZE).with_color(Color::WHITE),
             cursor_position: Vector2::zeros(),
             camera,
         }
