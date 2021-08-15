@@ -15,30 +15,29 @@ use std::{
 };
 
 /// 2D layout for a [`Tilemap`].
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct TileLayout<const ROWS: usize, const COLUMNS: usize>(Vec<Option<usize>>);
+pub struct TilemapLayout<const ROWS: usize, const COLUMNS: usize>(Vec<Option<usize>>);
 
-impl<const ROWS: usize, const COLUMNS: usize> Default for TileLayout<ROWS, COLUMNS> {
+impl<const ROWS: usize, const COLUMNS: usize> Default for TilemapLayout<ROWS, COLUMNS> {
     fn default() -> Self {
         Self(vec![None; ROWS * COLUMNS])
     }
 }
 
-impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
+impl<const ROWS: usize, const COLUMNS: usize> TilemapLayout<ROWS, COLUMNS> {
     /// Create a new layout from the given slice.
     ///
     /// # Errors
     ///
     /// This will return an error if the slice is not of appropriate size.
-    /// For a tile layout of [`TileLayout<ROWS, COLUMNS>`], the slice should have a length equal to `ROWS` * `COLUMNS`.
+    /// For a tile layout of [`TilemapLayout<ROWS, COLUMNS>`], the slice should have a length equal to `ROWS` * `COLUMNS`.
     ///
     /// # Examples
     ///
     /// The following example creates a `3x3` tile layout:
     ///
     /// ```
-    /// use ctrait::tile::TileLayout;
+    /// use ctrait::tile::TilemapLayout;
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let layout = [
     ///    None,
@@ -52,7 +51,7 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     ///    None,
     /// ]; // Slice has length of 9 = 3 * 3.
     ///
-    /// let tile_layout = TileLayout::<3, 3>::new(&layout)?;
+    /// let tile_layout = TilemapLayout::<3, 3>::new(&layout)?;
     /// assert_eq!(tile_layout[1][0], Some(2));
     /// # Ok(())
     /// # }
@@ -62,11 +61,11 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     /// layout dimensions:
     ///
     /// ```should_panic
-    /// use ctrait::tile::TileLayout;
+    /// use ctrait::tile::TilemapLayout;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let layout = [Some(1), Some(1), None]; // Slice has length of 3.
-    /// let tile_layout = TileLayout::<2, 3>::new(&layout)?; // Expects slice of length 6.
+    /// let tile_layout = TilemapLayout::<2, 3>::new(&layout)?; // Expects slice of length 6.
     /// # Ok(())
     /// # }
     /// ```
@@ -82,7 +81,7 @@ impl<const ROWS: usize, const COLUMNS: usize> TileLayout<ROWS, COLUMNS> {
     }
 }
 
-impl<const ROWS: usize, const COLUMNS: usize> Index<usize> for TileLayout<ROWS, COLUMNS> {
+impl<const ROWS: usize, const COLUMNS: usize> Index<usize> for TilemapLayout<ROWS, COLUMNS> {
     type Output = [Option<usize>];
     fn index(&self, row: usize) -> &Self::Output {
         let start = row * COLUMNS;
@@ -90,7 +89,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Index<usize> for TileLayout<ROWS, 
     }
 }
 
-impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TileLayout<ROWS, COLUMNS> {
+impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TilemapLayout<ROWS, COLUMNS> {
     fn index_mut(&mut self, row: usize) -> &mut Self::Output {
         let start = row * COLUMNS;
         &mut self.0[start..start + COLUMNS]
@@ -101,9 +100,8 @@ impl<const ROWS: usize, const COLUMNS: usize> IndexMut<usize> for TileLayout<ROW
 ///
 /// Each tile in a [`Tilemap`] can either be a sprite ([`Sprite`](Self::Sprite)) or colored square
 /// ([`Color`](Self::Color)).
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
-pub enum TileType {
+pub enum Tile {
     /// Represents a sprite tile, holding a [`PathBuf`] to the sprite texture.
     Sprite(PathBuf),
     /// Represents a colored square tile, holding a [`Color`].
@@ -119,8 +117,8 @@ pub struct Tilemap<const ROWS: usize, const COLUMNS: usize> {
     ///
     /// Each element represents a tile with an index corresponding to the index of the tile type in the
     /// tile set.
-    pub layout: TileLayout<ROWS, COLUMNS>,
-    tile_set: Vec<TileType>,
+    pub layout: TilemapLayout<ROWS, COLUMNS>,
+    tile_set: Vec<Tile>,
     tile_size: f32,
 }
 
@@ -130,21 +128,21 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// # Examples
     ///
     /// ```
-    /// use ctrait::{Color, tile::{Tilemap, TileType}};
+    /// use ctrait::{Color, tile::{Tilemap, Tile}};
     /// use std::path::PathBuf;
     ///
     /// // Create a tilemap with a set consisting of a red square and sprite.
     /// // Each tile will be rendered with a width and height of 64.
     /// let tilemap = Tilemap::<10, 5>::new(
-    ///     &[TileType::Color(Color::RED), TileType::Sprite(PathBuf::from("path/to/texture.png"))],
+    ///     &[Tile::Color(Color::RED), Tile::Sprite(PathBuf::from("path/to/texture.png"))],
     ///     64.0,
     /// );
     /// ```
     #[must_use]
-    pub fn new(set: &[TileType], tile_size: f32) -> Self {
+    pub fn new(set: &[Tile], tile_size: f32) -> Self {
         Self {
             position: Vector2::zeros(),
-            layout: TileLayout::default(),
+            layout: TilemapLayout::default(),
             tile_set: set.to_vec(),
             tile_size,
         }
@@ -172,16 +170,16 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     ///
     /// ```
     /// use ctrait::{
-    ///     tile::{TileLayout, TileType, Tilemap},
+    ///     tile::{TilemapLayout, Tile, Tilemap},
     ///     Color,
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let tilemap = Tilemap::<2, 3>::new(
-    ///     &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
+    ///     &[Tile::Color(Color::RED), Tile::Color(Color::WHITE)],
     ///     64.0,
     /// )
-    /// .with_layout(TileLayout::new(&[
+    /// .with_layout(TilemapLayout::new(&[
     ///     Some(0), // Red tile will be rendered at the top-left.
     ///     None,    // No tile will be rendered.
     ///     Some(1), // White tile will be rendered.
@@ -193,7 +191,7 @@ impl<const ROWS: usize, const COLUMNS: usize> Tilemap<ROWS, COLUMNS> {
     /// # }
     /// ```
     #[must_use]
-    pub fn with_layout(mut self, layout: TileLayout<ROWS, COLUMNS>) -> Self {
+    pub fn with_layout(mut self, layout: TilemapLayout<ROWS, COLUMNS>) -> Self {
         self.layout = layout;
         self
     }
@@ -216,12 +214,12 @@ impl<const ROWS: usize, const COLUMNS: usize> Renderable for Tilemap<ROWS, COLUM
                         // Adjust for offset relative to world position and tilemap position.
                         rect.position -= half_tilemap_dimensions - self.position;
                         match tile {
-                            TileType::Sprite(path) => {
+                            Tile::Sprite(path) => {
                                 // Render sprite.
                                 let sprite = Sprite::new(path, &rect);
                                 sprite.render(camera, context);
                             }
-                            TileType::Color(color) => {
+                            Tile::Color(color) => {
                                 // Render rect with specified color.
                                 let rect = rect.with_color(color);
                                 rect.render(camera, context);
@@ -238,13 +236,13 @@ impl<const ROWS: usize, const COLUMNS: usize> Renderable for Tilemap<ROWS, COLUM
 
 #[cfg(test)]
 mod tests {
-    use super::{Color, PathBuf, TileLayout, TileType, Tilemap, Vector2};
+    use super::{Color, PathBuf, Tile, Tilemap, TilemapLayout, Vector2};
 
     #[test]
     fn tile_layout_default() {
-        // Default constructor of TileLayout should result in passing a layout of length equal to
+        // Default constructor of TilemapLayout should result in passing a layout of length equal to
         // product of const generic ROWS and COLUMNS.
-        let tile_layout = TileLayout::<2, 3>::default();
+        let tile_layout = TilemapLayout::<2, 3>::default();
         assert_eq!(tile_layout.0.len(), 6);
         // By default, all tiles in the layout should be None.
         assert!(tile_layout.0.iter().all(|&tile| tile.is_none()));
@@ -252,25 +250,25 @@ mod tests {
 
     #[test]
     fn tile_layout_new() {
-        let tile_layout = TileLayout::<3, 2>::new(&[None; 6]).unwrap();
+        let tile_layout = TilemapLayout::<3, 2>::new(&[None; 6]).unwrap();
         assert_eq!(tile_layout.0.len(), 6);
     }
 
     #[test]
     fn tile_layout_new_error() {
-        let result = TileLayout::<3, 2>::new(&[None]);
+        let result = TilemapLayout::<3, 2>::new(&[None]);
         assert!(result.is_err());
     }
 
     #[test]
     fn tile_layout_index() {
-        let tile_layout = TileLayout::<2, 2>::new(&[None, None, Some(0), None]).unwrap();
+        let tile_layout = TilemapLayout::<2, 2>::new(&[None, None, Some(0), None]).unwrap();
         assert_eq!(tile_layout[1][0], Some(0));
     }
 
     #[test]
     fn tile_layout_index_mut() {
-        let mut tile_layout = TileLayout::<2, 2>::new(&[None, None, None, None]).unwrap();
+        let mut tile_layout = TilemapLayout::<2, 2>::new(&[None, None, None, None]).unwrap();
         tile_layout[1][0] = Some(0);
         assert_eq!(tile_layout[1][0], Some(0));
     }
@@ -279,18 +277,18 @@ mod tests {
     fn tilemap_new() {
         let tilemap = Tilemap::<10, 5>::new(
             &[
-                TileType::Color(Color::RED),
-                TileType::Sprite(PathBuf::from("texture.png")),
+                Tile::Color(Color::RED),
+                Tile::Sprite(PathBuf::from("texture.png")),
             ],
             64.0,
         );
         assert_eq!(tilemap.position, Vector2::zeros());
-        assert_eq!(tilemap.layout, TileLayout::default());
+        assert_eq!(tilemap.layout, TilemapLayout::default());
         assert_eq!(
             tilemap.tile_set,
             vec![
-                TileType::Color(Color::RED),
-                TileType::Sprite(PathBuf::from("texture.png"))
+                Tile::Color(Color::RED),
+                Tile::Sprite(PathBuf::from("texture.png"))
             ]
         );
         assert!((tilemap.tile_size - 64.0).abs() < f32::EPSILON);
@@ -304,7 +302,7 @@ mod tests {
 
     #[test]
     fn tilemap_with_layout() {
-        let tile_layout = TileLayout::<1, 2>::new(&[None, None]).unwrap();
+        let tile_layout = TilemapLayout::<1, 2>::new(&[None, None]).unwrap();
         let tilemap = Tilemap::new(&[], 0.0).with_layout(tile_layout.clone());
         assert_eq!(tilemap.layout, tile_layout);
     }

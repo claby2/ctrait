@@ -3,7 +3,7 @@ use ctrait::{
     entities, entity,
     game::Game,
     graphics::{RenderContext, Renderer},
-    tile::{TileLayout, TileType, Tilemap},
+    tile::{Tile, Tilemap, TilemapLayout},
     traits::Renderable,
     Color,
 };
@@ -19,12 +19,12 @@ impl World {
         Self {
             tilemap: Tilemap::new(
                 // The tilemap has two possible tiles: a red square or a white square.
-                &[TileType::Color(Color::RED), TileType::Color(Color::WHITE)],
+                &[Tile::Color(Color::RED), Tile::Color(Color::WHITE)],
                 64.0,
             )
             // The layout represents how the tiles are arranged.
             .with_layout(
-                TileLayout::new(&[
+                TilemapLayout::new(&[
                     Some(0), // Red tile will be rendered at the top-left.
                     None,    // No tile will be rendered.
                     Some(1), // White tile will be rendered.
