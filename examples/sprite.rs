@@ -2,8 +2,8 @@ use ctrait::{
     camera::Camera,
     entities, entity,
     game::Game,
+    graphics::{RenderContext, Renderer},
     rect::Rect,
-    render::{RenderContext, Renderer},
     sprite::Sprite,
     traits::Renderable,
 };

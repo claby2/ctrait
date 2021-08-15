@@ -2,9 +2,9 @@
 use crate::{
     camera::Camera,
     error::{CtraitError, CtraitResult},
+    graphics::RenderContext,
     math::Vector2,
     rect::Rect,
-    render::RenderContext,
     sprite::Sprite,
     traits::Renderable,
     Color,

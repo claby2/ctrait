@@ -1,7 +1,7 @@
 use crate::{
     camera::Camera,
     entity::{Entities, Entity},
-    render::{RenderContext, RendererConfig},
+    graphics::{RenderContext, RendererConfig},
     traits::{Interactive, Renderable},
 };
 use sdl2::{self, event::Event, pixels::Color, EventPump};
@@ -27,7 +27,7 @@ impl Renderer {
     /// # Examples
     ///
     /// ```
-    /// use ctrait::render::{Renderer, RendererConfig};
+    /// use ctrait::graphics::{Renderer, RendererConfig};
     ///
     /// // Create renderer with custom configuration.
     /// let custom_renderer = Renderer::new(
@@ -58,7 +58,7 @@ impl Renderer {
     /// # Examples
     ///
     /// ```
-    /// use ctrait::{camera::Camera, render::Renderer};
+    /// use ctrait::{camera::Camera, graphics::Renderer};
     ///
     /// let renderer = Renderer::default()
     ///     .with_camera(Camera::default());
@@ -75,7 +75,7 @@ impl Renderer {
     /// # Examples
     ///
     /// ```
-    /// use ctrait::{camera::Camera, entity, entity::Entity, render::Renderer, math::Vector2};
+    /// use ctrait::{camera::Camera, entity, entity::Entity, graphics::Renderer, math::Vector2};
     ///
     /// fn increment_camera_x(camera: Entity<Camera>) {
     ///     camera.lock().unwrap().position.x += 1.0;

@@ -1,6 +1,6 @@
 //! Sprite used to display textures.
 
-use crate::{camera::Camera, rect::Rect, render::RenderContext, traits::Renderable};
+use crate::{camera::Camera, graphics::RenderContext, rect::Rect, traits::Renderable};
 use std::path::PathBuf;
 
 /// A sprite which holds a path to a texture and a [`Rect`].

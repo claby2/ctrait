@@ -2,7 +2,7 @@ use ctrait::{
     camera::Camera,
     entities, entity,
     game::Game,
-    render::{RenderContext, Renderer},
+    graphics::{RenderContext, Renderer},
     tile::{TileLayout, TileType, Tilemap},
     traits::Renderable,
     Color,

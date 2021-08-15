@@ -3,9 +3,9 @@ use ctrait::{
     entities, entity,
     entity::{Entities, Entity},
     game::Game,
+    graphics::{RenderContext, Renderer},
     math::Vector2,
     rect::Rect,
-    render::{RenderContext, Renderer},
     traits::{FixedUpdate, Interactive, Renderable, Update},
     Color, Event, Keycode,
 };

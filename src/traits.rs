@@ -1,6 +1,6 @@
 //! Traits that structs can implement.
 
-use crate::{camera::Camera, render::RenderContext};
+use crate::{camera::Camera, graphics::RenderContext};
 use sdl2::event::Event;
 
 /// A type that should update every game loop iteration.
@@ -87,7 +87,7 @@ pub trait Interactive: Send {
 /// # Examples
 ///
 /// ```
-/// use ctrait::{camera::Camera, render::RenderContext, traits::Renderable};
+/// use ctrait::{camera::Camera, graphics::RenderContext, traits::Renderable};
 ///
 /// struct RenderableExample;
 ///
@@ -98,6 +98,6 @@ pub trait Interactive: Send {
 /// }
 /// ```
 pub trait Renderable: Send {
-    /// Called by [`Renderer`](crate::render::Renderer).
+    /// Called by [`Renderer`](crate::graphics::Renderer).
     fn render(&self, camera: &Camera, context: &mut RenderContext);
 }

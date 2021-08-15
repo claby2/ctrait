@@ -1,6 +1,6 @@
 //! Rectangle.
 
-use crate::{camera::Camera, math::Vector2, render::RenderContext, traits::Renderable};
+use crate::{camera::Camera, graphics::RenderContext, math::Vector2, traits::Renderable};
 use sdl2::{pixels::Color, rect::Rect as CanvasRect};
 
 /// A rectangle relative to world coordinates.

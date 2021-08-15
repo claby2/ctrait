@@ -3,7 +3,7 @@
 use crate::{
     entity::Entities,
     error::CtraitResult,
-    render::{manager::TextureManager, RenderContext, Renderer},
+    graphics::{RenderContext, Renderer, TextureManager},
     traits::{FixedUpdate, Interactive, Renderable, Update},
 };
 use chrono::Duration;

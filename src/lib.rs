@@ -19,8 +19,8 @@
 //!     camera::Camera,
 //!     entity, entities,
 //!     game::Game,
+//!     graphics::{RenderContext, Renderer},
 //!     rect::Rect,
-//!     render::{RenderContext, Renderer},
 //!     traits::Renderable,
 //!     Color,
 //! };
@@ -65,8 +65,8 @@ pub mod camera;
 pub mod entity;
 pub mod error;
 pub mod game;
+pub mod graphics;
 pub mod rect;
-pub mod render;
 pub mod sprite;
 pub mod tile;
 pub mod traits;

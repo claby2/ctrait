@@ -101,7 +101,7 @@ impl<T: ?Sized> Entities<T> {
     ///     camera::Camera,
     ///     entity, entities,
     ///     game::Game,
-    ///     render::RenderContext,
+    ///     graphics::RenderContext,
     ///     traits::Renderable
     /// };
     ///

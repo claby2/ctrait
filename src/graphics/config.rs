@@ -10,7 +10,7 @@ macro_rules! set_flag {
     };
 }
 
-/// Configuration for [`Renderer`](crate::render::Renderer).
+/// Configuration for [`Renderer`](crate::graphics::Renderer).
 #[allow(clippy::module_name_repetitions, clippy::struct_excessive_bools)]
 #[derive(Debug)]
 pub struct RendererConfig {
