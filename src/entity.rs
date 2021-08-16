@@ -164,14 +164,14 @@ mod tests {
 
     #[test]
     fn entity_access() {
-        impl Test {
-            #[allow(clippy::unused_self)]
-            fn it_works(&self) -> bool {
-                true
+        struct Number(u8);
+        impl Number {
+            fn value(&self) -> u8 {
+                self.0
             }
         }
-        let entity = entity!(Test {});
-        assert!(entity.lock().unwrap().it_works());
+        let entity = entity!(Number(3));
+        assert_eq!(entity.lock().unwrap().value(), 3);
     }
 
     #[test]
